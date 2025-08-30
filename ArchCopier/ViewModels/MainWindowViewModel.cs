@@ -43,6 +43,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private bool _isReqauringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
+	private Settings _currentSettings;
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
 	internal ILogger _logger;
 	private Visibility _progressBarVisibility;
@@ -283,6 +284,44 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	#endregion
 	
+	#region WriteSettingsFileCommand
+
+	public ICommand WriteSettingsFileCommand { get; }
+
+	private bool CanWriteSettingsFileExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnWriteSettingsFileExecuted(object p)
+	{
+		var jsonTextForWrite = string.Empty;
+		if (CurrentSettings != null)
+			jsonTextForWrite =
+				Infrastructure.Utilits.JsonProcessor.SerialiseJSON(_distinctListOfGosts);
+		_fileService.WriteFileWithDialog(_pathToJsonDirectory, jsonTextForWrite, "json");
+		Console.WriteLine($"Записан json файл в папку {_pathToJsonDirectory}");
+	}
+
+	#endregion
+	
+	#region ChooseDirectoryWithArchACommand
+
+	public ICommand ChooseDirectoryWithArchACommand { get; }
+
+	private bool CanChooseDirectoryWithArchAExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnChooseDirectoryWithArchAExecuted(object p)
+	{
+		var result = _componentCollectionModel.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
+		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+	}
+
+	#endregion
+	
 	#region GetHelpCommand
 
 	public ICommand GetHelpCommand { get; }
@@ -339,6 +378,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		_currentDirectory = GetStartDirectory();
 		_fileService = fileService;
 		_registryService = registryService;
+		_currentSettings = new Settings();
 		ComponentListControl = new ComponentsListView();
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
@@ -375,6 +415,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		GetHelpCommand =
 			new LambdaCommand(OnGetHelpExecuted, CanGetHelpExecute);
+		
+		WriteSettingsFileCommand =
+			new LambdaCommand(OnWriteSettingsFileExecuted, CanWriteSettingsFileExecute);
 		
 		CloseApplicationCommand =
 			new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
