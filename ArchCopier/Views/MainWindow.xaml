@@ -47,11 +47,20 @@
             
             <MenuItem Header="Открыть сборку" Command="{Binding OpenAssemblyCommand}" />
             
+            <MenuItem Header="Настройки">
+                <MenuItem Header="Внешний вид" Command="{Binding GetHelpCommand}" />
+                <MenuItem Header="Указать рабочую папку с архивом А" Command="{Binding ChooseDirectoryWithArchACommand}" />
+                <MenuItem Header="Указать рабочую папку с архивом В" Command="{Binding ChooseDirectoryWithArchBCommand}" />
+                <MenuItem Header="Указать рабочую папку с проектами А" Command="{Binding ChooseDirectoryWithProjectsACommand}" />
+                <MenuItem Header="Указать рабочую папку с проектами В" Command="{Binding ChooseDirectoryWithProjectsACommand}" />
+                <MenuItem Header="Выбрать файл настроек" Command="{Binding ChooseSettingsFileCommand}" />
+                <MenuItem Header="Записать файл настроек" Command="{Binding WriteSettingsFileCommand}" />
+                <MenuItem Header="Перечитать файл настроек" Command="{Binding RereadSettingsFileCommand}" />
+                
+            </MenuItem>
+            
             <MenuItem Header="Помощь">
                 <MenuItem Header="Справка" Command="{Binding GetHelpCommand}" />
-                <MenuItem Header="Проверить обновления" Command="{Binding CheckForUpdatesCommand}" />
-                <MenuItem Header="Обновить программу" Command="{Binding GetUpdateCommand}" />
-                <MenuItem Header="Задать папку с обновлениями" Command="{Binding SetDirectoryWithUpdatesCommand}" />
                 <MenuItem Header="О программе">
                     <MenuItem.Command>
                         <commands:ManageAboutProgramCommand />

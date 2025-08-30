@@ -54,6 +54,7 @@
 
     <ItemGroup>
       <Folder Include="Data\" />
+      <Folder Include="Resources\Settings\" />
     </ItemGroup>
 
 </Project>

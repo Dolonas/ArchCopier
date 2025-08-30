@@ -67,9 +67,7 @@ public class Kompas3D : IEntity
 	{
 		get
 		{
-			if (_kompas7 is null)
-				return string.Empty;
-			var document = (KompasDocument)_kompas7.ActiveDocument;
+			var document = (KompasDocument)_kompas7?.ActiveDocument;
 			if (document is null)
 				return string.Empty;
 			return document.PathName;
