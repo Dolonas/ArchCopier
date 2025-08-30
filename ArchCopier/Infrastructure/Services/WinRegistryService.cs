@@ -7,9 +7,9 @@ using System.Windows;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
-using ProductComposition.Models;
+using ArchCopier.Models;
 
-namespace ProductComposition.Infrastructure.Services;
+namespace ArchCopier.Infrastructure.Services;
 
 public class WinRegistryService: IRegistryService
 {

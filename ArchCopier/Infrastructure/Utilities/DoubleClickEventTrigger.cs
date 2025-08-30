@@ -2,7 +2,7 @@ using System;
 using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 
-namespace ProductComposition.Infrastructure.Utilities;
+namespace ArchCopier.Infrastructure.Utilities;
 
 public class DoubleClickEventTrigger : EventTrigger
 {

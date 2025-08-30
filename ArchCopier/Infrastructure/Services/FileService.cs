@@ -6,9 +6,9 @@ using System.Linq;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
-using ProductComposition.Models;
+using ArchCopier.Models;
 
-namespace ProductComposition.Infrastructure.Services;
+namespace ArchCopier.Infrastructure.Services;
 
 public class FileService : IFileService
 {

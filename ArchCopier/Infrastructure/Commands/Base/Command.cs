@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace ProductComposition.Infrastructure.Commands.Base;
+namespace ArchCopier.Infrastructure.Commands.Base;
 
 public abstract class Command : ICommand
 {

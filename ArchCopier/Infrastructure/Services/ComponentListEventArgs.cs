@@ -1,6 +1,6 @@
 using System;
 
-namespace ProductComposition.Infrastructure.Services;
+namespace ArchCopier.Infrastructure.Services;
 
 public class ComponentListEventArgs : EventArgs
 {

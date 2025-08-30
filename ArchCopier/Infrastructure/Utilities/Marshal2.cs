@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 
-namespace ProductComposition.Infrastructure.Utilities;
+namespace ArchCopier.Infrastructure.Utilities;
 
 public static class Marshal2 //класс на замену больше не поддерживаемого класса Marshal
 {

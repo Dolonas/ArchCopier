@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using ProductComposition.Models.Interfaces;
-using ProductComposition.ViewModels.Base;
+using ArchCopier.Models.Interfaces;
+using ArchCopier.ViewModels.Base;
 
-namespace ProductComposition.Models;
+namespace ArchCopier.Models;
 
 public class ComponentCollectionModel : ViewModel, IEntity
 {

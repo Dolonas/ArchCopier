@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace ProductComposition.ViewModels.Base;
+namespace ArchCopier.ViewModels.Base;
 
 /// <summary>
 /// No WPF project is complete without it's own version of this.

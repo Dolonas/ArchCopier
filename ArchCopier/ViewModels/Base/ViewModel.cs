@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ProductComposition.ViewModels.Base;
+namespace ArchCopier.ViewModels.Base;
 
 public abstract class ViewModel : INotifyPropertyChanged
 {

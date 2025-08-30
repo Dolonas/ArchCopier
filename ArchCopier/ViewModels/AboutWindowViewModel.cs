@@ -1,9 +1,9 @@
 using System.Windows;
 using System.Windows.Input;
-using ProductComposition.Infrastructure.Commands;
-using ProductComposition.ViewModels.Base;
+using ArchCopier.Infrastructure.Commands;
+using ArchCopier.ViewModels.Base;
 
-namespace ProductComposition.ViewModels;
+namespace ArchCopier.ViewModels;
 
 public class AboutWindowViewModel : ViewModel
 {

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ProductComposition.Infrastructure.Commands;
-using ProductComposition.Infrastructure.Services;
-using ProductComposition.ViewModels.Base;
-using ProductComposition.Models;
-using ProductComposition.Views;
+using ArchCopier.Infrastructure.Commands;
+using ArchCopier.Infrastructure.Services;
+using ArchCopier.ViewModels.Base;
+using ArchCopier.Models;
+using ArchCopier.Views;
 using Serilog;
 
 //TODO: - написать ТЗ
@@ -24,7 +24,7 @@ using Serilog;
 //TODO: - прикрутить справочную систему 
 //TODO: - копирование файлов в такие же подпапки как в окружении изначальной сборки
 
-namespace ProductComposition.ViewModels;
+namespace ArchCopier.ViewModels;
 
 internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 {
@@ -296,7 +296,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnGetHelpExecuted(object p)
 	{
-		var FullNameOfHelpCHMFile = Path.GetFullPath(GetPathToHelpFile() + "\\ProductCompositionHelp.chm");
+		var FullNameOfHelpCHMFile = Path.GetFullPath(GetPathToHelpFile() + "\\ArchCopierHelp.chm");
 		
 		if (!File.Exists(FullNameOfHelpCHMFile))
 		{
@@ -407,7 +407,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		if(Directory.Exists(pathToHelpDirectoryVar1))
 			return pathToHelpDirectoryVar1;
 		else
-			return Path.GetFullPath(_pathToThisAppDirectory + @"..\..\..\..\ProductComposition\Resources\Help"); //вариант номер два, если приложение отлаживается из IDE
+			return Path.GetFullPath(_pathToThisAppDirectory + @"..\..\..\..\ArchCopier\Resources\Help"); //вариант номер два, если приложение отлаживается из IDE
 	}
 	
 	private void SetKompasAndWorkButtonsStatus(byte kompasByteStatus)

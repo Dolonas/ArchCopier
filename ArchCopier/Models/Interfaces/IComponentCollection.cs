@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace ProductComposition.Models.Interfaces;
+namespace ArchCopier.Models.Interfaces;
 
 public interface IComponentCollection
 {

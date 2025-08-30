@@ -1,4 +1,4 @@
-namespace ProductComposition.Models.Interfaces;
+namespace ArchCopier.Models.Interfaces;
 
 public interface IEntity
 {

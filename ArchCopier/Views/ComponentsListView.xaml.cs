@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace ProductComposition.Views;
+namespace ArchCopier.Views;
 
 public partial class ComponentsListView : UserControl
 {

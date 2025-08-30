@@ -1,7 +1,7 @@
 using System;
-using ProductComposition.Infrastructure.Commands.Base;
+using ArchCopier.Infrastructure.Commands.Base;
 
-namespace ProductComposition.Infrastructure.Commands;
+namespace ArchCopier.Infrastructure.Commands;
 
 public class LambdaCommand : Command
 {

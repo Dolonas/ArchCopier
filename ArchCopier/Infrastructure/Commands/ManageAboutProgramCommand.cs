@@ -1,9 +1,9 @@
 using System;
 using System.Windows;
-using ProductComposition.Infrastructure.Commands.Base;
-using ProductComposition.Views;
+using ArchCopier.Infrastructure.Commands.Base;
+using ArchCopier.Views;
 
-namespace ProductComposition.Infrastructure.Commands;
+namespace ArchCopier.Infrastructure.Commands;
 
 public class ManageAboutProgramCommand : Command
 {

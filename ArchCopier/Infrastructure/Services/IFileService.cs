@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using ProductComposition.Models;
+using ArchCopier.Models;
 
-namespace ProductComposition.Infrastructure.Services;
+namespace ArchCopier.Infrastructure.Services;
 
 public interface IFileService
 {

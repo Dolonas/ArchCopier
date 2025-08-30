@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace ProductComposition.Views;
+namespace ArchCopier.Views;
 
 public partial class AboutWindow : Window
 {

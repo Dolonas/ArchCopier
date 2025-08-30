@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
-using ProductComposition.Infrastructure.Services;
-using ProductComposition.ViewModels;
+using ArchCopier.Infrastructure.Services;
+using ArchCopier.ViewModels;
 using Microsoft.Win32;
 using Serilog;
 using Serilog.Core;
 
-namespace ProductComposition.Views;
+namespace ArchCopier.Views;
 
 public partial class MainWindow
 {

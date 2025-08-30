@@ -4,13 +4,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using ProductComposition.Infrastructure.Commands;
-using ProductComposition.Infrastructure.Services;
-using ProductComposition.Models;
-using ProductComposition.Models.Interfaces;
-using ProductComposition.ViewModels.Base;
+using ArchCopier.Infrastructure.Commands;
+using ArchCopier.Infrastructure.Services;
+using ArchCopier.Models;
+using ArchCopier.Models.Interfaces;
+using ArchCopier.ViewModels.Base;
 
-namespace ProductComposition.ViewModels;
+namespace ArchCopier.ViewModels;
 
 public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, IComponentCollection
 {

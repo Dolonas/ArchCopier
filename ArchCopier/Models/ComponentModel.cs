@@ -1,8 +1,8 @@
 using System.IO;
 using KompasAPI7;
-using ProductComposition.Models.Interfaces;
+using ArchCopier.Models.Interfaces;
 
-namespace ProductComposition.Models;
+namespace ArchCopier.Models;
 
 public class ComponentModel : IEntity
 {

@@ -1,4 +1,4 @@
-﻿namespace ProductComposition.Infrastructure.Services;
+﻿namespace ArchCopier.Infrastructure.Services;
 
 public class RegistryKeyParameters
 {

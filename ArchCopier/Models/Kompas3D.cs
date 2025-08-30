@@ -8,10 +8,10 @@ using Kompas6API5;
 using Kompas6Constants;
 using KompasAPI7;
 using Serilog;
-using ProductComposition.Infrastructure.Utilities;
-using IEntity = ProductComposition.Models.Interfaces.IEntity;
+using ArchCopier.Infrastructure.Utilities;
+using IEntity = ArchCopier.Models.Interfaces.IEntity;
 
-namespace ProductComposition.Models;
+namespace ArchCopier.Models;
 
 public enum HideMessageEnum { Show,  AlwaysYes, AlwaysNo}
 public enum DocType { Drawing, Part, Assembly, Spec, Fragment, Textual, Unknown }
