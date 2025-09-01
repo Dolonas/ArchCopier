@@ -28,7 +28,10 @@ public class JsonProcessor
 		_path = path;
 		_fileName = "settings.json";
 	}
-
+	public static Settings? DeserialiseJSON(string jsonInString)
+	{
+		return JsonSerializer.Deserialize<Settings>(jsonInString);
+	}
 	
 
 	public static string SerialiseJSON(Settings settings)

@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ArchCopier.Infrastructure.Commands;
 using ArchCopier.Infrastructure.Services;
+using ArchCopier.Infrastructure.Utilities;
 using ArchCopier.ViewModels.Base;
 using ArchCopier.Models;
 using ArchCopier.Views;
@@ -43,7 +44,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private bool _isReqauringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
-	private Settings _currentSettings;
+	private string _nameOfFileSettings;
+	private Settings? _currentSettings;
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
 	internal ILogger _logger;
 	private Visibility _progressBarVisibility;
@@ -125,6 +127,16 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		{
 			_arhDirectory = value;
 			NotifyPropertyChanged(nameof(ArhDirectory));
+		}
+	}
+	
+	public Settings CurrentSettings
+	{
+		get => _currentSettings;
+		set
+		{
+			_currentSettings = value;
+			NotifyPropertyChanged(nameof(CurrentSettings));
 		}
 	}
 	public Visibility ProgressBarVisibility
@@ -298,7 +310,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		var jsonTextForWrite = string.Empty;
 		if (CurrentSettings != null)
 			jsonTextForWrite =
-				Infrastructure.Utilits.JsonProcessor.SerialiseJSON(_distinctListOfGosts);
+				JsonProcessor.SerialiseJSON(_distinctListOfGosts);
 		_fileService.WriteFileWithDialog(_pathToJsonDirectory, jsonTextForWrite, "json");
 		Console.WriteLine($"Записан json файл в папку {_pathToJsonDirectory}");
 	}
@@ -378,7 +390,10 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		_currentDirectory = GetStartDirectory();
 		_fileService = fileService;
 		_registryService = registryService;
-		_currentSettings = new Settings();
+		_nameOfFileSettings = Path.Combine(_pathToThisAppDirectory, @"Resources\Settings\settings.json" );
+		_currentSettings = GetSettingsFromFile(_nameOfFileSettings);
+		if (_currentSettings is null)
+			_nameOfFileSettings = CreateSettingsFile(_nameOfFileSettings);
 		ComponentListControl = new ComponentsListView();
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
@@ -484,6 +499,33 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 	}
 
+	private Settings? GetSettingsFromFile(string fileName)
+	{
+		var jsonFileInString = _fileService.ReadFileToString(fileName);
+		if(string.IsNullOrEmpty(jsonFileInString))
+			return null;
+		var result  = JsonProcessor.DeserialiseJSON(jsonFileInString);
+		if(result == null)
+			_logger.Error("Не удалось получить файл настроек по пути {filename}");
+		return result;
+	}
+	private string CreateSettingsFile(string fileName)
+	{
+		string jsonFileInString = string.Empty;
+		if (_currentSettings != null)
+		{
+			jsonFileInString = JsonProcessor.SerialiseJSON(_currentSettings);
+			if(string.IsNullOrEmpty(jsonFileInString))
+				return string.Empty;
+		}
+		var newFileName = _fileService.WriteFile(fileName, jsonFileInString);
+		return newFileName;
+	}
+	private string GenerateFileName(string fileName)
+	{
+		
+	}
+
 	private List<string> ConvertToListString(ObservableCollection<ComponentModel> collection)
 	{
 		var result = new List<string>();
@@ -495,7 +537,13 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void WriteEnvironmentVariablesToLog()
 	{
+		_logger.Information($"MachineName: {Environment.MachineName}");
+		_logger.Information($"OS version: {Environment.OSVersion}");
+		var drives = Environment.GetLogicalDrives();
+		_logger.Information($"Logical drives: {String.Join(", ", drives)}");
+		_logger.Information($"UserDomainName: {Environment.UserDomainName}");
 		
+		_logger.Information($"UserName: {Environment.UserName}");
 	}
 	
 }

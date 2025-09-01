@@ -13,6 +13,9 @@ public interface IFileService
 	string ChooseDirectory();
 	int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory);
 	string ReadFileWithDialog(string pathToDirectory, string filterByExtension);
+	string ReadFileToString(string fileName);
 	void WriteFileWithDialog(string pathToDirectory, string txtIntoFile, string filterByExtension);
+	string WriteFile(string pathToDirectory, string txtIntoFile);
+	void GetNearestFileName(string fileName, out string nearestFileName);
 	string? OpenFileByFullPath(string fullFileName);
 }

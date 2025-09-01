@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
@@ -12,6 +9,7 @@ namespace ArchCopier.Infrastructure.Services;
 
 public class FileService : IFileService
 {
+	//private readonly ILogger _logger;
 	public string[] ArrayOfMasks { get; set; }
 
 	public FileService(string currentDirectory, string[] arrayOfMasks)
@@ -91,6 +89,14 @@ public class FileService : IFileService
 
 		return result;
 	}
+	public string ReadFileToString(string fileName)
+	{
+		if(!File.Exists(fileName))
+			return string.Empty;
+		using var r = new StreamReader(fileName);
+		var result = r.ReadToEnd();
+		return result;
+	}
 	
 	public string ChooseDirectory()
 	{
@@ -136,11 +142,52 @@ public class FileService : IFileService
 			CheckFileExists = false
 		};
 		if (sfd.ShowDialog() != true) return;
-		using (var wr = new StreamWriter(sfd.FileName))
+		using var wr = new StreamWriter(sfd.FileName);
+		wr.WriteLine(txtIntoFile);
+	}
+	
+	public string WriteFile(string fileName, string txtIntoFile)
+	{
+		string nearestFileName = fileName;
+		if (File.Exists(fileName))
 		{
-			wr.WriteLine(txtIntoFile);
+			//_logger.Debug($"Попытка записи в файл {fileName} - такой файл уже существует. Попытка записать файл рядом...");
+			GetNearestFileName(fileName, out nearestFileName);
+			//_logger.Debug($"Получено имя файла {nearestFileName}");
+		}
+		using var wr = new StreamWriter(fileName);
+		wr.WriteLine(txtIntoFile);
+		if (File.Exists(fileName))
+		{
+			//_logger.Information($"Создан файл {fileName}");
+			return nearestFileName;
+		}
+		else
+		{
+			return string.Empty;
 		}
 	}
 
-	
+	public void GetNearestFileName(string fileName, out string nearestFileName)
+	{
+		var shortFileName = Path.GetFileName(fileName);
+		var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(shortFileName);
+		string newFileNameWithoutExtension;
+		var pattern = @"\(\d\)\.";
+		var regex = new Regex(pattern);
+		var matches = Regex.Matches(shortFileName, pattern);
+		var lastMatch = matches[^1];
+		var valueOfFileIndexAtEnd = lastMatch.Value;
+		if(string.IsNullOrEmpty(valueOfFileIndexAtEnd))
+		{
+			newFileNameWithoutExtension = string.Concat(fileNameWithoutExtension, (1));
+			shortFileName = newFileNameWithoutExtension + Path.GetExtension(shortFileName);
+			nearestFileName = string.Concat(Path.GetDirectoryName(fileName), shortFileName);
+			return;
+		}
+		var intValue = int.Parse(valueOfFileIndexAtEnd);
+		newFileNameWithoutExtension = fileNameWithoutExtension.Replace(valueOfFileIndexAtEnd, $"({++intValue})");
+		shortFileName = newFileNameWithoutExtension + Path.GetExtension(shortFileName);
+		nearestFileName = string.Concat(Path.GetDirectoryName(fileName), shortFileName);
+	}
 }
