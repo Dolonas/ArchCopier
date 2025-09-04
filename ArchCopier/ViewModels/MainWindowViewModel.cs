@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -130,7 +126,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 	}
 	
-	public Settings CurrentSettings
+	public Settings? CurrentSettings
 	{
 		get => _currentSettings;
 		set
@@ -310,9 +306,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		var jsonTextForWrite = string.Empty;
 		if (CurrentSettings != null)
 			jsonTextForWrite =
-				JsonProcessor.SerialiseJSON(_distinctListOfGosts);
-		_fileService.WriteFileWithDialog(_pathToJsonDirectory, jsonTextForWrite, "json");
-		Console.WriteLine($"Записан json файл в папку {_pathToJsonDirectory}");
+				JsonProcessor.SerialiseJSON(CurrentSettings);
+		_fileService.WriteFileWithDialog(_nameOfFileSettings, jsonTextForWrite, "json");
+		_logger.Information($"Записан json файл в папку {Path.GetDirectoryName(_nameOfFileSettings)}");
 	}
 
 	#endregion
@@ -520,10 +516,6 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 		var newFileName = _fileService.WriteFile(fileName, jsonFileInString);
 		return newFileName;
-	}
-	private string GenerateFileName(string fileName)
-	{
-		
 	}
 
 	private List<string> ConvertToListString(ObservableCollection<ComponentModel> collection)

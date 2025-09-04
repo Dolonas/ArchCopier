@@ -155,6 +155,11 @@ public class FileService : IFileService
 			GetNearestFileName(fileName, out nearestFileName);
 			//_logger.Debug($"Получено имя файла {nearestFileName}");
 		}
+
+		if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+		{
+			Directory.CreateDirectory(Path.GetDirectoryName(fileName) ?? throw new InvalidOperationException());
+		}
 		using var wr = new StreamWriter(fileName);
 		wr.WriteLine(txtIntoFile);
 		if (File.Exists(fileName))
