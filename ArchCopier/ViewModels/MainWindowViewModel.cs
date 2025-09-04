@@ -242,7 +242,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnOpenArchDirectoryExecuted(object p)
 	{
-		ArhDirectory = _fileService.ChooseDirectory();
+		ArhDirectory = _fileService.ChooseDirectory(CurrentSettings.ArchDirectoryA);
 		Status = "Папка с архивом назначена";
 	}
 

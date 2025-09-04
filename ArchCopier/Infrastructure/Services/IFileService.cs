@@ -11,6 +11,7 @@ public interface IFileService
 	string CurrentDirectory { get; set; }
 	string ChooseFile(string pathToDirectory, string filterByExtension);
 	string ChooseDirectory();
+	string ChooseDirectory(string pathToDirectory);
 	int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory);
 	string ReadFileWithDialog(string pathToDirectory, string filterByExtension);
 	string ReadFileToString(string fileName);

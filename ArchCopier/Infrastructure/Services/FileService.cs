@@ -109,6 +109,18 @@ public class FileService : IFileService
 		if (ofd.ShowDialog() != CommonFileDialogResult.Ok) return string.Empty;
 		return Path.GetFullPath(ofd.FileName);
 	}
+	
+	public string ChooseDirectory(string pathToDirectory)
+	{
+		var ofd = new CommonOpenFileDialog("Выберите папку архива")
+		{
+			InitialDirectory = pathToDirectory,
+			IsFolderPicker = true,
+			Multiselect = true
+		};
+		if (ofd.ShowDialog() != CommonFileDialogResult.Ok) return string.Empty;
+		return Path.GetFullPath(ofd.FileName);
+	}
 
 	public string? OpenFileByFullPath(string fullFileName)
 	{
