@@ -176,22 +176,27 @@ public class FileService : IFileService
 	public void GetNearestFileName(string fileName, out string nearestFileName)
 	{
 		var shortFileName = Path.GetFileName(fileName);
+		string valueOfFileIndexAtEnd = string.Empty;
 		var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(shortFileName);
 		string newFileNameWithoutExtension;
 		var pattern = @"\(\d\)\.";
 		var regex = new Regex(pattern);
 		var matches = Regex.Matches(shortFileName, pattern);
-		var lastMatch = matches[^1];
-		var valueOfFileIndexAtEnd = lastMatch.Value;
-		if(string.IsNullOrEmpty(valueOfFileIndexAtEnd))
+		if(matches.Count > 0)
+		{
+			var lastMatch = matches[^1];
+			valueOfFileIndexAtEnd = lastMatch.Value;
+		}
+		else
 		{
 			newFileNameWithoutExtension = string.Concat(fileNameWithoutExtension, (1));
 			shortFileName = newFileNameWithoutExtension + Path.GetExtension(shortFileName);
 			nearestFileName = string.Concat(Path.GetDirectoryName(fileName), shortFileName);
 			return;
 		}
-		var intValue = int.Parse(valueOfFileIndexAtEnd);
-		newFileNameWithoutExtension = fileNameWithoutExtension.Replace(valueOfFileIndexAtEnd, $"({++intValue})");
+		
+		int.TryParse(valueOfFileIndexAtEnd, out int number);
+		newFileNameWithoutExtension = fileNameWithoutExtension.Replace(valueOfFileIndexAtEnd, $"({++number})");
 		shortFileName = newFileNameWithoutExtension + Path.GetExtension(shortFileName);
 		nearestFileName = string.Concat(Path.GetDirectoryName(fileName), shortFileName);
 	}

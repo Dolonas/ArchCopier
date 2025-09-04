@@ -30,7 +30,16 @@ public class JsonProcessor
 	}
 	public static Settings? DeserialiseJSON(string jsonInString)
 	{
-		return JsonSerializer.Deserialize<Settings>(jsonInString);
+		Settings? settings = null;
+		try
+		{
+			settings = JsonSerializer.Deserialize<Settings>(jsonInString);
+		}
+		catch
+		{
+			
+		}
+		return settings;
 	}
 	
 

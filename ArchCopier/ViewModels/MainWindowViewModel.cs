@@ -304,11 +304,14 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private void OnWriteSettingsFileExecuted(object p)
 	{
 		var jsonTextForWrite = string.Empty;
-		if (CurrentSettings != null)
-			jsonTextForWrite =
-				JsonProcessor.SerialiseJSON(CurrentSettings);
-		_fileService.WriteFileWithDialog(_nameOfFileSettings, jsonTextForWrite, "json");
-		_logger.Information($"Записан json файл в папку {Path.GetDirectoryName(_nameOfFileSettings)}");
+		if (CurrentSettings is null)
+		{
+			_logger.Debug("Settings is null, невозможно его записать");
+			return;
+		}
+		jsonTextForWrite = JsonProcessor.SerialiseJSON(CurrentSettings);
+		var newFileName = _fileService.WriteFile(_nameOfFileSettings, jsonTextForWrite);
+		_logger.Information($"Записан файл настроек в папку {Path.GetDirectoryName(newFileName)}");
 	}
 
 	#endregion
@@ -324,11 +327,24 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnChooseDirectoryWithArchAExecuted(object p)
 	{
-		var result = _componentCollectionModel.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
-		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		var resultDirectory= _fileService.ChooseDirectory();
+		if (string.IsNullOrEmpty(resultDirectory))
+		{
+			
+			Status = "Папка не назначена";
+		}
+		else
+		{
+			_logger.Information($"Папка по умолчанию с архивом 'А' назначена {resultDirectory}");
+			Status = "Папка по умолчанию с архивом 'А' назначена";
+			if (CurrentSettings != null) CurrentSettings.ArchDirectoryA = resultDirectory;
+			else _logger.Debug($"Сбой записи в Settings, они null (");
+		}
+		
 	}
 
 	#endregion
+
 	
 	#region GetHelpCommand
 
@@ -356,6 +372,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	}
 
 	#endregion
+	
+
+	
 	
 	#region CloseApplicationCommand
 	
@@ -387,8 +406,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		_fileService = fileService;
 		_registryService = registryService;
 		_nameOfFileSettings = Path.Combine(_pathToThisAppDirectory, @"Resources\Settings\settings.json" );
-		_currentSettings = GetSettingsFromFile(_nameOfFileSettings);
-		if (_currentSettings is null)
+		CurrentSettings = GetSettingsFromFile(_nameOfFileSettings);
+		if (CurrentSettings is null)
 			_nameOfFileSettings = CreateSettingsFile(_nameOfFileSettings);
 		ComponentListControl = new ComponentsListView();
 		KompasInstance = new Kompas3D(_logger);
@@ -426,6 +445,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		GetHelpCommand =
 			new LambdaCommand(OnGetHelpExecuted, CanGetHelpExecute);
+		
+		ChooseDirectoryWithArchACommand =
+			new LambdaCommand(OnChooseDirectoryWithArchAExecuted, CanChooseDirectoryWithArchAExecute);
 		
 		WriteSettingsFileCommand =
 			new LambdaCommand(OnWriteSettingsFileExecuted, CanWriteSettingsFileExecute);
@@ -502,19 +524,27 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			return null;
 		var result  = JsonProcessor.DeserialiseJSON(jsonFileInString);
 		if(result == null)
-			_logger.Error("Не удалось получить файл настроек по пути {filename}");
+			_logger.Debug($"Не удалось получить файл настроек по пути {fileName}");
 		return result;
 	}
 	private string CreateSettingsFile(string fileName)
 	{
-		string jsonFileInString = string.Empty;
-		if (_currentSettings != null)
+		var jsonFileInString = string.Empty;
+		if (CurrentSettings is null)
 		{
-			jsonFileInString = JsonProcessor.SerialiseJSON(_currentSettings);
-			if(string.IsNullOrEmpty(jsonFileInString))
-				return string.Empty;
+			_logger.Debug("CurrentSettings is null");
+			CurrentSettings = new Settings
+			{
+				SettingsFileName = fileName,
+				ArchDirectoryA = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+				ArchDirectoryB = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+				ProjectsDirectoryA = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+				ProjectsDirectoryB = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+			};
+			jsonFileInString = JsonProcessor.SerialiseJSON(CurrentSettings);
 		}
 		var newFileName = _fileService.WriteFile(fileName, jsonFileInString);
+		_logger.Information($"Создан файл настроек по пути {newFileName}");
 		return newFileName;
 	}
 
