@@ -33,7 +33,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _currentDirectory;
 	private string _kompasButtonName;
 	private string _runButtonName;
-	private ObservableCollection<ComponentModel>? _collectionOfComponents;
+	private ComponentCollectionModel? _componentCollection;
 	private UserControl? _componentListControl;
 	private bool _isKompasButtonEnabled;
 	private bool _isReqauringKompasButtonsEnabled;
@@ -94,13 +94,13 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 	}
 	
-	public ObservableCollection<ComponentModel>? CollectionOfComponents
+	public ComponentCollectionModel? ComponentCollection
 	{
-		get => _collectionOfComponents ?? null;
+		get => _componentCollection ?? null;
 		set
 		{
-			_collectionOfComponents = value;
-			NotifyPropertyChanged(nameof(CollectionOfComponents));
+			_componentCollection = value;
+			NotifyPropertyChanged(nameof(ComponentCollection));
 		}
 	}
 	
@@ -257,9 +257,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
-		if (_collectionOfComponents != null)
+		if (ComponentCollection is not null)
 		{
-			var result = _fileService.CopyFiles(ConvertToListString(_collectionOfComponents),
+			var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
 				ArhDirectory);
 			if (result == 0)
 				Status = "Файлы не скопированы по неизвестной причине";
@@ -284,7 +284,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var result = CollectionOfComponents.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
+		var result = _componentCollection?.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
 		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 	}
 
@@ -410,8 +410,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
-		CollectionOfComponents = new ObservableCollection<ComponentModel>();
-		ComponentListVM = new ComponentListViewModel(CollectionOfComponents);
+		ComponentCollection = new ComponentCollectionModel();
+		ComponentCollection.PropertyChanged += PropertyChanged;
+		ComponentListVM = new ComponentListViewModel(ComponentCollection);
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
 		_fileService.CurrentDirectory = _currentDirectory;

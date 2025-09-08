@@ -78,6 +78,6 @@ public class ComponentModel : IEntity
 
 	public override string ToString()
 	{
-		return ComponentName;
+		return ShortFileName;
 	}
 }

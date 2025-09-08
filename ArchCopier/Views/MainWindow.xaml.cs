@@ -1,11 +1,8 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Threading;
 using ArchCopier.Infrastructure.Services;
 using ArchCopier.ViewModels;
 using Microsoft.Win32;
-using Serilog;
-using Serilog.Core;
 
 namespace ArchCopier.Views;
 
