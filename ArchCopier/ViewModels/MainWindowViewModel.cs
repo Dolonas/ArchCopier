@@ -284,8 +284,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var result = _componentCollectionModel.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
-		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		//var result = _componentCollectionModel.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
+		//Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 	}
 
 	#endregion
@@ -411,8 +411,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
-		ComponentCollectionModel = new ComponentCollectionModel();
-		ComponentCollectionModel.PropertyChanged += Model_PropertyChanged;
+		//ComponentCollectionModel = new ComponentCollectionModel();
+		//ComponentCollectionModel.PropertyChanged += Model_PropertyChanged;
 		ComponentListVM = new ComponentListViewModel(ComponentCollectionModel);
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
