@@ -15,7 +15,7 @@ public class ComponentModel : IEntity
 		{
 			if (ComponentDesignation is null)
 				return string.Empty;
-			return ComponentDesignation.Length > 0 ? Path.GetFileName(ComponentDesignation) : string.Empty;
+			return ComponentDesignation.Length > 0 ? ComponentDesignation : string.Empty;
 		}
 	}
 	
@@ -78,7 +78,6 @@ public class ComponentModel : IEntity
 
 	public override string ToString()
 	{
-		if (ComponentName != null) return ComponentName;
-		return string.Empty;
+		return ComponentName;
 	}
 }

@@ -33,7 +33,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _currentDirectory;
 	private string _kompasButtonName;
 	private string _runButtonName;
-	private ObservableCollection<ComponentModel>? _componentCollectionModel;
+	private ObservableCollection<ComponentModel>? _collectionOfComponents;
 	private UserControl? _componentListControl;
 	private bool _isKompasButtonEnabled;
 	private bool _isReqauringKompasButtonsEnabled;
@@ -94,13 +94,13 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 	}
 	
-	public ObservableCollection<ComponentModel>? ComponentCollectionModel
+	public ObservableCollection<ComponentModel>? CollectionOfComponents
 	{
-		get => _componentCollectionModel ?? null;
+		get => _collectionOfComponents ?? null;
 		set
 		{
-			_componentCollectionModel = value;
-			NotifyPropertyChanged(nameof(FullNameOfCurrentAssembly));
+			_collectionOfComponents = value;
+			NotifyPropertyChanged(nameof(CollectionOfComponents));
 		}
 	}
 	
@@ -257,9 +257,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
-		if (_componentCollectionModel != null)
+		if (_collectionOfComponents != null)
 		{
-			var result = _fileService.CopyFiles(ConvertToListString(_componentCollectionModel),
+			var result = _fileService.CopyFiles(ConvertToListString(_collectionOfComponents),
 				ArhDirectory);
 			if (result == 0)
 				Status = "Файлы не скопированы по неизвестной причине";
@@ -284,8 +284,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		//var result = _componentCollectionModel.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
-		//Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		var result = CollectionOfComponents.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
+		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 	}
 
 	#endregion
@@ -301,13 +301,12 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnWriteSettingsFileExecuted(object p)
 	{
-		var jsonTextForWrite = string.Empty;
 		if (CurrentSettings is null)
 		{
 			_logger.Debug("Settings is null, невозможно его записать");
 			return;
 		}
-		jsonTextForWrite = JsonProcessor.SerialiseJSON(CurrentSettings);
+		var jsonTextForWrite = JsonProcessor.SerialiseJSON(CurrentSettings);
 		var newFileName = _fileService.WriteFile(_nameOfFileSettings, jsonTextForWrite);
 		_logger.Information($"Записан файл настроек в папку {Path.GetDirectoryName(newFileName)}");
 	}
@@ -355,16 +354,16 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnGetHelpExecuted(object p)
 	{
-		var FullNameOfHelpCHMFile = Path.GetFullPath(GetPathToHelpFile() + "\\ArchCopierHelp.chm");
+		var fullNameOfHelpChmFile = Path.GetFullPath(GetPathToHelpFile() + "\\ArchCopierHelp.chm");
 		
-		if (!File.Exists(FullNameOfHelpCHMFile))
+		if (!File.Exists(fullNameOfHelpChmFile))
 		{
-			Status = $"Файл справки по пути {FullNameOfHelpCHMFile} не найден";
+			Status = $"Файл справки по пути {fullNameOfHelpChmFile} не найден";
 			return;
 		}
 		
 		var proc = new System.Diagnostics.Process();
-		proc.StartInfo.FileName = FullNameOfHelpCHMFile;
+		proc.StartInfo.FileName = fullNameOfHelpChmFile;
 		proc.StartInfo.UseShellExecute = true;
 		proc.Start ();
 	}
@@ -411,9 +410,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
-		//ComponentCollectionModel = new ComponentCollectionModel();
-		//ComponentCollectionModel.PropertyChanged += Model_PropertyChanged;
-		ComponentListVM = new ComponentListViewModel(ComponentCollectionModel);
+		CollectionOfComponents = new ObservableCollection<ComponentModel>();
+		ComponentListVM = new ComponentListViewModel(CollectionOfComponents);
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
 		_fileService.CurrentDirectory = _currentDirectory;

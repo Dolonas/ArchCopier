@@ -15,18 +15,15 @@ namespace ArchCopier.ViewModels;
 public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, IComponentCollection
 {
 	public new event PropertyChangedEventHandler? PropertyChanged;
-
-	private ComponentCollectionModel _componentCollection;
-	private ObservableCollection<ComponentModel>? _componentList;
+	private ObservableCollection<ComponentModel>? _componentCollection;
 	private ComponentModel? _selectedComponent;
 
-	public ObservableCollection<ComponentModel>? ComponentList
+	public ObservableCollection<ComponentModel>? ComponentCollection
 	{
-		get => _componentList ?? null;
+		get => _componentCollection ?? null;
 		set
 		{
-			_componentCollection.SetComponents(value);
-			_componentList = value;
+			_componentCollection = value;
 			OnPropertyChanged();
 		}
 	}
@@ -36,7 +33,6 @@ public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, ICompon
 		get => _selectedComponent ?? null;
 		set
 		{
-			_componentCollection.SetSelectedComponent(value);
 			_selectedComponent = value;
 			OnPropertyChanged();
 		}
@@ -44,17 +40,13 @@ public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, ICompon
 
 
 
-	public ComponentListViewModel(ObservableCollection<ComponentModel> componentListModel)
+	public ComponentListViewModel(ObservableCollection<ComponentModel> componentCollection)
 	{
-		_componentList = componentListModel;
-		_componentCollection.PropertyChanged += Model_PropertyChanged;
-		if (_componentList is not null)
-			SelectedComponent = _componentList[0];
+		ComponentCollection = componentCollection;
+		if (ComponentCollection.Count == 0)
+			ComponentCollection.Add(new ComponentModel("Компонент 1", string.Empty));
+		if (_componentCollection is not null)
+			SelectedComponent = ComponentCollection[0];
 	}
 
-	private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-	{
-		if (string.IsNullOrEmpty(e.PropertyName))
-			OnPropertyChanged(e.PropertyName);
-	}
 }
