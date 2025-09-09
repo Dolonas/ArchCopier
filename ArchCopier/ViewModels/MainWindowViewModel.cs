@@ -412,7 +412,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
 		ComponentCollection = new ComponentCollectionModel();
-		ComponentCollection.PropertyChanged += PropertyChanged;
+		ComponentCollection.PropertyChanged += Model_PropertyChanged;
 		ComponentListVM = new ComponentListViewModel(ComponentCollection);
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
