@@ -32,11 +32,10 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private UserControl? _currentControl;
 	private readonly IFileService _fileService;
 	private readonly IRegistryService _registryService;
-	private string _currentDirectory;
 	private string _kompasButtonName;
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
-	private UserControl? _componentListControl;
+	private readonly UserControl? _componentListControl;
 	private bool _isKompasButtonEnabled;
 	private bool _isReqauringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
@@ -44,7 +43,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private readonly string _nameOfFileSettings;
 	private Settings? _currentSettings;
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
-	internal ILogger _logger;
+	private readonly ILogger _logger;
 	private Visibility _progressBarVisibility;
 	
 	private Kompas3D KompasInstance { get; }
@@ -95,16 +94,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			NotifyPropertyChanged(nameof(IsKompasButtonEnabled));
 		}
 	}
-	
-	public ComponentCollectionModel? ComponentCollection
-	{
-		get => _componentCollection ?? null;
-		set
-		{
-			_componentCollection = value;
-			NotifyPropertyChanged(nameof(ComponentCollection));
-		}
-	}
+
+	public ObservableCollection<ComponentModel> ComponentList => _componentCollection.GetComponentList();
 	
 	public string FullNameOfCurrentAssembly
 	{
@@ -159,7 +150,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	public UserControl? ComponentListControl
 	{
 		get => _componentListControl;
-		private set
+		private init
 		{
 			_componentListControl = value;
 			NotifyPropertyChanged(nameof(ComponentListControl));
@@ -224,7 +215,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnOpenAssemblyExecuted(object p)
 	{
-		FullNameOfCurrentAssembly = _fileService.ChooseFile(_currentDirectory, "a3d");
+		FullNameOfCurrentAssembly = _fileService.ChooseFile(_currentSettings?.ProjectsDirectoryA, "a3d");
 		KompasInstance.OpenComponent(FullNameOfCurrentAssembly);
 		Status = $"Сборка открыта";
 	}
@@ -242,7 +233,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnOpenArchDirectoryExecuted(object p)
 	{
-		ArhDirectory = _fileService.ChooseDirectory(CurrentSettings.ArchDirectoryA);
+		ArhDirectory = _fileService.ChooseDirectory(CurrentSettings?.ArchDirectoryA);
 		Status = "Папка с архивом назначена";
 	}
 
@@ -259,7 +250,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
-		if (ComponentCollection is not null)
+		if (ComponentList is not null)
 		{
 			var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
 				ArhDirectory);
@@ -343,6 +334,34 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	}
 
 	#endregion
+	
+	#region ChooseDirectoryWithProjectsACommand
+
+	public ICommand ChooseDirectoryWithProjectsACommand { get; }
+
+	private bool CanChooseDirectoryWithProjectsAExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnChooseDirectoryWithProjectsAExecuted(object p)
+	{
+		var resultDirectory= _fileService.ChooseDirectory();
+		if (string.IsNullOrEmpty(resultDirectory))
+		{
+			Status = "Папка не назначена";
+		}
+		else
+		{
+			_logger.Information($"Папка по умолчанию с проектами 'А' назначена {resultDirectory}");
+			Status = "Папка по умолчанию с проектами 'А'назначена";
+			if (CurrentSettings != null) CurrentSettings.ProjectsDirectoryA = resultDirectory;
+			else _logger.Debug($"Сбой записи в Settings, они null (");
+		}
+		
+	}
+
+	#endregion
 
 	
 	#region GetHelpCommand
@@ -401,7 +420,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			.WriteTo.File("logs\\product_composition.log", rollingInterval: RollingInterval.Day)  
 			.CreateLogger();
 		WriteEnvironmentVariablesToLog();
-		_currentDirectory = GetStartDirectory();
+		var currentDirectory = GetStartDirectory();
 		_fileService = fileService;
 		_registryService = registryService;
 		_nameOfFileSettings = Path.Combine(_pathToThisAppDirectory, @"Resources\Settings\settings.json" );
@@ -409,20 +428,20 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		if (CurrentSettings is null)
 			_nameOfFileSettings = CreateSettingsFile(_nameOfFileSettings);
 		ComponentListControl = new ComponentsListView();
+		CurrentControl =ComponentListControl;
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
-		ComponentCollection = new ComponentCollectionModel();
-		ComponentCollection.PropertyChanged += Model_PropertyChanged;
-		ComponentListVM = new ComponentListViewModel(ComponentCollection);
+		_componentCollection = new ComponentCollectionModel();
+		_componentCollection.PropertyChanged += Model_PropertyChanged;
+		ComponentListVM = new ComponentListViewModel(_componentCollection);
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
-		_fileService.CurrentDirectory = _currentDirectory;
+		_fileService.CurrentDirectory = currentDirectory;
 		_fileService.ArrayOfMasks = new[] { ".a3d" };
 		FullNameOfCurrentAssembly = "Сборка";
 		ArhDirectory = "Путь к архиву";
 		Status = GetStatusFromResult(KompasInstance.TryGetActiveKompas());
-		CurrentControl =ComponentListControl;
 		ProgressBarVisibility = Visibility.Hidden;
 		
 		#region Commands
@@ -447,6 +466,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		ChooseDirectoryWithArchACommand =
 			new LambdaCommand(OnChooseDirectoryWithArchAExecuted, CanChooseDirectoryWithArchAExecute);
+		
+		ChooseDirectoryWithProjectsACommand =
+			new LambdaCommand(OnChooseDirectoryWithProjectsAExecuted, CanChooseDirectoryWithProjectsAExecute);
 		
 		WriteSettingsFileCommand =
 			new LambdaCommand(OnWriteSettingsFileExecuted, CanWriteSettingsFileExecute);
@@ -547,7 +569,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		return newFileName;
 	}
 
-	private List<string> ConvertToListString(ObservableCollection<ComponentModel> collection)
+	private List<string> ConvertToListString(ObservableCollection<ComponentModel>? collection)
 	{
 		var result = new List<string>();
 		foreach (var component in collection)

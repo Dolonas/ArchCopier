@@ -6,9 +6,23 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
-        <AssemblyVersion>0.0.7</AssemblyVersion>
-        <FileVersion>0.0.7</FileVersion>
+        <AssemblyVersion>0.0.8</AssemblyVersion>
+        <FileVersion>0.0.8</FileVersion>
         <ApplicationIcon>Resources\IconsAndImages\agt_forward_5778.ico</ApplicationIcon>
+        <Version>0.0.8</Version>
+        <Copyright>Pavel Dolonas Shishkin</Copyright>
+        <NeutralLanguage>ru</NeutralLanguage>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
+      <Prefer32bit>true</Prefer32bit>
+      <WarningLevel>3</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <PlatformTarget>x64</PlatformTarget>
+      <Prefer32bit>true</Prefer32bit>
     </PropertyGroup>
 
 

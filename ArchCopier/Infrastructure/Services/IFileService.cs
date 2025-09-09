@@ -9,9 +9,9 @@ public interface IFileService
 {
 	string[] ArrayOfMasks { get; set; }
 	string CurrentDirectory { get; set; }
-	string ChooseFile(string pathToDirectory, string filterByExtension);
+	string ChooseFile(string? pathToDirectory, string filterByExtension);
 	string ChooseDirectory();
-	string ChooseDirectory(string pathToDirectory);
+	string ChooseDirectory(string? pathToDirectory);
 	int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory);
 	string ReadFileWithDialog(string pathToDirectory, string filterByExtension);
 	string ReadFileToString(string fileName);

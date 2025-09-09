@@ -126,7 +126,7 @@
             </DockPanel>
         </StackPanel>
         <DockPanel Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="0 0 2 10" VerticalAlignment="Top" HorizontalAlignment="Left" Height="340" Width="470">
-            <ContentControl Content="{Binding CurrentControl}" />
+            <ContentControl Content="{Binding ComponentListControl}" />
         </DockPanel>
 
         <DockPanel Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" LastChildFill="True" Margin="0 0 2 0" Height="26"
