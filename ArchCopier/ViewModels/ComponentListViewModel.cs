@@ -10,11 +10,11 @@ public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, ICompon
 {
 	public new event PropertyChangedEventHandler? PropertyChanged;
 	
-	private ComponentCollectionModel _componentCollection;
+	private readonly ComponentCollectionModel _componentCollection;
 	private ObservableCollection<ComponentModel>? _componentList;
 	private ComponentModel? _selectedComponent;
 
-	public ObservableCollection<ComponentModel>? ComponentCollection
+	public ObservableCollection<ComponentModel>? ComponentList
 	{
 		get => _componentList ?? null;
 		set
@@ -40,7 +40,8 @@ public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, ICompon
 	public ComponentListViewModel(ComponentCollectionModel componentCollection)
 	{
 		_componentCollection = componentCollection;
-		SelectedComponent = ComponentCollection?[0];
+		_componentCollection.PropertyChanged += Model_PropertyChanged;
+		SelectedComponent = _componentList?[0];
 	}
 	
 	private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -12,6 +12,7 @@ using ArchCopier.ViewModels.Base;
 using ArchCopier.Models;
 using ArchCopier.Views;
 using Serilog;
+// ReSharper disable InconsistentNaming
 
 //TODO: - написать ТЗ
 //TODO: - прописывать строчки путей с последними выбранными строчками сборок или папок архива в реестр, сделать сервис для работы с реестром
@@ -39,7 +40,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private bool _isReqauringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
-	private string _nameOfFileSettings;
+	private readonly string _nameOfFileSettings;
 	private Settings? _currentSettings;
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
 	internal ILogger _logger;
@@ -157,7 +158,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	public UserControl? ComponentListControl
 	{
 		get => _componentListControl;
-		private init
+		private set
 		{
 			_componentListControl = value;
 			NotifyPropertyChanged(nameof(ComponentListControl));

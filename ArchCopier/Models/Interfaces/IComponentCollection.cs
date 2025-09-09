@@ -4,10 +4,7 @@ namespace ArchCopier.Models.Interfaces;
 
 public interface IComponentCollection
 {
-	public ObservableCollection<ComponentModel>? ComponentCollection { get; set; }
+	public ObservableCollection<ComponentModel>? ComponentList { get; set; }
 	public ComponentModel? SelectedComponent { get; set; }
 
-	private void Model_PropertyChanged()
-	{
-	}
 }
