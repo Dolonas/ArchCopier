@@ -16,11 +16,11 @@ public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, ICompon
 
 	public ObservableCollection<ComponentModel>? ComponentList
 	{
-		get => _componentList ?? null;
+		get => _componentList;
 		set
 		{
 			_componentCollection.SetComponents(value);
-			_componentList = value;
+			if (value != null) _componentList = new ObservableCollection<ComponentModel>(value);
 			OnPropertyChanged();
 		}
 	}
@@ -40,6 +40,8 @@ public class ComponentListViewModel : ViewModel, INotifyPropertyChanged, ICompon
 	public ComponentListViewModel(ComponentCollectionModel componentCollection)
 	{
 		_componentCollection = componentCollection;
+		ComponentList = _componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
+		_componentList = new ObservableCollection<ComponentModel>(_componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>());
 		_componentCollection.PropertyChanged += Model_PropertyChanged;
 		SelectedComponent = _componentList?[0];
 	}

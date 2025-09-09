@@ -53,15 +53,15 @@ public class ComponentCollectionModel : ViewModel, IEntity
             SelectedComponent = value;
     }
 
-    public void RemoveFile(ComponentModel deletingFile)
+    public void RemoveComponent(ComponentModel deletingFile)
     {
         if (_components != null && _selectedComponent != deletingFile)
             _components.Remove(deletingFile);
     }
 
-    public ObservableCollection<ComponentModel>? GetFileList()
+    public ObservableCollection<ComponentModel>? GetComponentList()
     {
-        return _components;
+        return _components ?? null;
     }
 
     public ComponentModel? GetSelectedFile()
