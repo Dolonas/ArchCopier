@@ -126,7 +126,13 @@
             </DockPanel>
         </StackPanel>
         <DockPanel Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="0 0 2 10" VerticalAlignment="Top" HorizontalAlignment="Left" Height="340" Width="470">
-            <ContentControl Content="{Binding ComponentListControl}" />
+            <DockPanel LastChildFill="True" Margin="0 0 0 0">
+                <GroupBox DockPanel.Dock="Top" Width="auto" Height="auto" Header="Список компонентов сборки">
+                    <ListBox ItemsSource="{Binding ComponentList}" DisplayMemberPath="ShortFileName"
+                             SelectedItem="{Binding SelectedComponent, Mode=TwoWay}">
+                    </ListBox>
+                </GroupBox>
+            </DockPanel>
         </DockPanel>
 
         <DockPanel Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" LastChildFill="True" Margin="0 0 2 0" Height="26"

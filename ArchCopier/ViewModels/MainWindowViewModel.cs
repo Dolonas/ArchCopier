@@ -40,6 +40,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private bool _isReqauringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
+	private ObservableCollection<ComponentModel>? _componentList;
+	private ComponentModel? _selectedComponent;
 	private readonly string _nameOfFileSettings;
 	private Settings? _currentSettings;
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -94,8 +96,6 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			NotifyPropertyChanged(nameof(IsKompasButtonEnabled));
 		}
 	}
-
-	public ObservableCollection<ComponentModel> ComponentList => _componentCollection.GetComponentList();
 	
 	public string FullNameOfCurrentAssembly
 	{
@@ -117,6 +117,28 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 	}
 	
+	public ObservableCollection<ComponentModel>? ComponentList
+	{
+		get => _componentList;
+		set
+		{
+			_componentCollection.SetComponents(value);
+			if (value != null) _componentList = new ObservableCollection<ComponentModel>(value);
+			OnPropertyChanged();
+		}
+	}
+
+	public ComponentModel? SelectedComponent
+	{
+		get => _selectedComponent ?? null;
+		set
+		{
+			_selectedComponent = value;
+			NotifyPropertyChanged(nameof(SelectedComponent));
+		}
+	}
+
+	
 	public Settings? CurrentSettings
 	{
 		get => _currentSettings;
@@ -135,27 +157,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			NotifyPropertyChanged(nameof(ProgressBarVisibility));
 		}
 	}
+
 	
-	private ComponentListViewModel? ComponentListVM { get; }
-	
-	public UserControl? CurrentControl
-	{
-		get => _currentControl;
-		private set
-		{
-			_currentControl = value;
-			NotifyPropertyChanged(nameof(CurrentControl));
-		}
-	}
-	public UserControl? ComponentListControl
-	{
-		get => _componentListControl;
-		private init
-		{
-			_componentListControl = value;
-			NotifyPropertyChanged(nameof(ComponentListControl));
-		}
-	}
 	
 	public bool IsReqauringKompasButtonsEnabled
 	{
@@ -427,14 +430,14 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		CurrentSettings = GetSettingsFromFile(_nameOfFileSettings);
 		if (CurrentSettings is null)
 			_nameOfFileSettings = CreateSettingsFile(_nameOfFileSettings);
-		ComponentListControl = new ComponentsListView();
-		CurrentControl =ComponentListControl;
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
 		_componentCollection = new ComponentCollectionModel();
+		ComponentList = _componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
+		_componentList = new ObservableCollection<ComponentModel>(_componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>());
 		_componentCollection.PropertyChanged += Model_PropertyChanged;
-		ComponentListVM = new ComponentListViewModel(_componentCollection);
+		SelectedComponent = _componentList?[0];
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
 		_fileService.CurrentDirectory = currentDirectory;
