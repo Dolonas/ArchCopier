@@ -119,11 +119,15 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	
 	public ObservableCollection<ComponentModel>? ComponentList
 	{
-		get => _componentList;
+		get
+		{
+			if (_componentCollection != null) return _componentCollection.ComponentCollection;
+			return new ObservableCollection<ComponentModel>();
+		}
 		set
 		{
-			_componentCollection.SetComponents(value);
-			if (value != null) _componentList = new ObservableCollection<ComponentModel>(value);
+			if (_componentCollection != null) _componentCollection.SetComponents(value);
+			if (value is null) _componentList = new ObservableCollection<ComponentModel>(value);
 			OnPropertyChanged();
 		}
 	}
@@ -280,8 +284,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var result = _componentCollection?.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
-		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		ComponentList = KompasInstance.GetAllPartsOfActiveAssembly();
+		Status = ComponentList.Count > 0 ? $"Сборка прочитана, в ней найдено {ComponentList.Count} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 	}
 
 	#endregion
@@ -435,8 +439,6 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		RunButtonName = "Прочитать сборку";
 		_componentCollection = new ComponentCollectionModel();
 		ComponentList = _componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
-		_componentList = new ObservableCollection<ComponentModel>(_componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>());
-		_componentCollection.PropertyChanged += Model_PropertyChanged;
 		SelectedComponent = _componentList?[0];
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
