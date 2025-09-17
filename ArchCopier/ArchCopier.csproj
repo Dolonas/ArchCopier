@@ -6,9 +6,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
-        <AssemblyVersion>0.0.8</AssemblyVersion>
-        <FileVersion>0.0.8</FileVersion>
-        <ApplicationIcon>Resources\IconsAndImages\agt_forward_5778.ico</ApplicationIcon>
+        <AssemblyVersion>0.0.9</AssemblyVersion>
+        <FileVersion>0.0.9</FileVersion>
+        <ApplicationIcon>Resources\IconsAndImages\Folder-3D_256x256-2.ico</ApplicationIcon>
         <Version>0.0.8</Version>
         <Copyright>Pavel Dolonas Shishkin</Copyright>
         <NeutralLanguage>ru</NeutralLanguage>
@@ -64,6 +64,17 @@
 
     <ItemGroup>
       <Folder Include="Resources\Settings\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\IconsAndImages\Folder - 3D_256x256+.ico" />
+      <Resource Include="Resources\IconsAndImages\Folder - 3D_256x256+.ico">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="Resources\IconsAndImages\Folder-3D_256x256-2.ico" />
+      <Resource Include="Resources\IconsAndImages\Folder-3D_256x256-2.ico">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
 </Project>
