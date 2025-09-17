@@ -63,10 +63,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Resources\Help\ArchCopierHelp.chm" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="Resources\Settings\" />
     </ItemGroup>
 

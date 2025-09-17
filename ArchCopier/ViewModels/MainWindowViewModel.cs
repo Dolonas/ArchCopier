@@ -15,12 +15,8 @@ using Serilog;
 // ReSharper disable InconsistentNaming
 
 //TODO: - сделать неактивными кнопки "прочитать сборку" и др., если компас не подключен, чтобы не генерировать исключения
-//TODO: - убрать пункт осн. меню "Открыть сборку"
-//TODO: - дополнить пункты меню "Компас": сделать наверное как в StTr
-//TODO: - убрать функционал, когда после выбора файла сборки он сразу открывается в Компасе, сделать это по отдельной команде
 //TODO: - сделать возможность считывать уже открытую в Компасе активную сборку
 //TODO: - копирование файлов в такие же подпапки как в окружении изначальной сборки, а может быть по какому-то специальному правилу
-//TODO: - в логере поменять строчку при записи "product_composition" на "acrh_copier"
 
 namespace ArchCopier.ViewModels;
 
@@ -28,7 +24,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 {
 	public new event PropertyChangedEventHandler? PropertyChanged;
 
-	private string _title = "Product Composition";
+	private string _title = "Архив";
 	private string? _status;
 	private UserControl? _currentControl;
 	private readonly IFileService _fileService;
@@ -211,6 +207,98 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	}
 
 	#endregion
+		#region CheckKompasInstallCommand
+
+	public ICommand CheckKompasInstallCommand { get; }
+
+	private bool CanCheckKompasInstallExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnCheckKompasInstallExecuted(object p)
+	{
+		var kompasByteStatus = KompasInstance.TryGetActiveKompas();
+		Status = kompasByteStatus switch
+		{
+			0 => "Компас не установлен",
+			1 => "Компас установлен, но не запущен",
+			2 => "Компас установлен и запущен",
+			_ => "Компас не установлен"
+		};
+		SetKompasAndWorkButtonsStatus(
+			kompasByteStatus); // установка того, какие кнопки становятся активны, а какие - нет
+	}
+
+	#endregion
+	
+	#region MakeKompasInvisibleCommand
+
+	public ICommand MakeKompasInvisibleCommand { get; }
+
+	private bool CanMakeKompasInvisibleExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnMakeKompasInvisibleExecuted(object p)
+	{
+		KompasInstance.Visibility = false;
+		Status = "Компас переведён в невидимый режим";
+	}
+
+	#endregion
+	
+	#region MakeKompasVisibleCommand
+
+	public ICommand MakeKompasVisibleCommand { get; }
+
+	private bool CanMakeKompasVisibleExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnMakeKompasVisibleExecuted(object p)
+	{
+		KompasInstance.Visibility = true;
+		Status = "Компас переведён в видимый режим";
+	}
+
+	#endregion
+	
+	#region MuteKompasModeWithNoCommand
+
+	public ICommand MuteKompasModeWithYesCommand { get; }
+
+	private bool CanMuteKompasModeWithYesExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnMuteKompasModeWithYesExecuted(object p)
+	{
+		KompasInstance.HideMassageMode = HideMessageEnum.AlwaysYes;
+		Status = "Компас переведён режим игнорирования диалоговых окон с ответом \"Да\"";
+	}
+
+	#endregion
+	
+	#region MuteKompasModeWithNoCommand
+
+	public ICommand MuteKompasModeWithNoCommand { get; }
+
+	private bool CanMuteKompasModeWithNoExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnMuteKompasModeWithNoExecuted(object p)
+	{
+		KompasInstance.HideMassageMode = HideMessageEnum.AlwaysNo;
+		Status = "Компас переведён режим игнорирования диалоговых окон с ответом \"Нет\"";
+	}
+
+	#endregion
 	
 	#region OpenAssemblyCommand
 
@@ -223,9 +311,30 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnOpenAssemblyExecuted(object p)
 	{
-		FullNameOfCurrentAssembly = _fileService.ChooseFile(_currentSettings?.ProjectsDirectoryA, "a3d");
+		if (!File.Exists(FullNameOfCurrentAssembly))
+		{
+			Status = $"Файл или не выбран или не существует";
+			return;
+		}
 		KompasInstance.OpenComponent(FullNameOfCurrentAssembly);
 		Status = $"Сборка открыта";
+	}
+
+	#endregion
+	
+	#region ChooseAssemblyCommand
+
+	public ICommand ChooseAssemblyCommand { get; }
+
+	private bool CanChooseAssemblyExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnChooseAssemblyExecuted(object p)
+	{
+		FullNameOfCurrentAssembly = _fileService.ChooseFile(_currentSettings?.ProjectsDirectoryA, "a3d");
+		Status = $"Сборка выбрана";
 	}
 
 	#endregion
@@ -425,7 +534,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		Title = $"Загрузчик архива v {Assembly.GetExecutingAssembly().GetName().Version} betta";
 		_logger = new LoggerConfiguration()  
 			.MinimumLevel.Debug() 
-			.WriteTo.File("logs\\product_composition.log", rollingInterval: RollingInterval.Day)  
+			.WriteTo.File("logs\\arch_copier.log", rollingInterval: RollingInterval.Day)  
 			.CreateLogger();
 		WriteEnvironmentVariablesToLog();
 		var currentDirectory = GetStartDirectory();
@@ -455,8 +564,26 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		StartKompasCommand =
 			new LambdaCommand(OnStartKompasCommandExecuted, CanStartKompasCommandExecute);
 		
+		CheckKompasInstallCommand =
+			new LambdaCommand(OnCheckKompasInstallExecuted, CanCheckKompasInstallExecute);
+		
+		MakeKompasInvisibleCommand =
+			new LambdaCommand(OnMakeKompasInvisibleExecuted, CanMakeKompasInvisibleExecute);
+		
+		MakeKompasVisibleCommand =
+			new LambdaCommand(OnMakeKompasVisibleExecuted, CanMakeKompasVisibleExecute);
+		
+		MuteKompasModeWithYesCommand =
+			new LambdaCommand(OnMuteKompasModeWithYesExecuted, CanMuteKompasModeWithYesExecute);
+		
+		MuteKompasModeWithNoCommand =
+			new LambdaCommand(OnMuteKompasModeWithNoExecuted, CanMuteKompasModeWithNoExecute);
+		
 		OpenAssemblyCommand =
 			new LambdaCommand(OnOpenAssemblyExecuted, CanOpenAssemblyExecute);
+		
+		ChooseAssemblyCommand =
+			new LambdaCommand(OnChooseAssemblyExecuted, CanChooseAssemblyExecute);
 		
 		OpenArchDirectoryCommand =
 			new LambdaCommand(OnOpenArchDirectoryExecuted, CanOpenArchDirectoryExecute);

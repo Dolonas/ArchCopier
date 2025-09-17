@@ -27,6 +27,7 @@ public class Kompas3D : IEntity
 	private DocType _activeDocumentType;
 	private IKompasDocument3D _partOrAssembly;
 	private bool _visibility;
+	private HideMessageEnum _hideMassegeMode;
 	private HideMessageEnum _hideMassageMode;
 	private ILogger _logger;
 

@@ -42,9 +42,17 @@
                 
                 <MenuItem Header="Выход" Command="{Binding CloseApplicationCommand}" />
             </MenuItem>
-            <MenuItem Header="Компас"/>
-            
-            <MenuItem Header="Открыть сборку" Command="{Binding OpenAssemblyCommand}" />
+            <MenuItem Header="Компас">
+                <MenuItem Header="Проверить Компас" Command="{Binding CheckKompasInstallCommand}" />
+                <MenuItem Header="Запустить Компас" Command="{Binding StartKompasCommand}" />
+                <MenuItem Header="Перезапустить Компас" Command="{Binding RestartKompasCommand}" />
+                <MenuItem Header="Закрыть Компас" Command="{Binding CloseKompasCommand}" />
+                <MenuItem Header="Перевести в видимый режим" Command="{Binding MakeKompasVisibleCommand}" />
+                <MenuItem Header="Перевести в невидимый режим" Command="{Binding MakeKompasInvisibleCommand}" />
+                <MenuItem Header="Молчаливый режим с ответом 'Да'" Command="{Binding MuteKompasModeWithYesCommand}" />
+                <MenuItem Header="Молчаливый режим с ответом 'Нет'" Command="{Binding MuteKompasModeWithNoCommand}" />
+                
+            </MenuItem>
             
             <MenuItem Header="Настройки">
                 <MenuItem Header="Внешний вид" Command="{Binding GetHelpCommand}" />
@@ -91,7 +99,7 @@
                     HorizontalAlignment="Left"
                     Margin="5 0 0 0 "
                     Content="Выбрать сборку"
-                    Command="{Binding OpenAssemblyCommand}"
+                    Command="{Binding ChooseAssemblyCommand}"
                     IsEnabled="{Binding IsReqauringKompasButtonsEnabled}"
                     Style="{StaticResource MaterialDesignPaperButton}"
                     ToolTip="Выбрать головную сборку проекта" />
