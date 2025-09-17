@@ -14,6 +14,8 @@ using ArchCopier.Views;
 using Serilog;
 // ReSharper disable InconsistentNaming
 
+//TODO: - сделать отображаемым список с компонентами
+//TODO: - сделать отбор оригинальных компонентов прямо в componentCollection по linq
 //TODO: - сделать неактивными кнопки "прочитать сборку" и др., если компас не подключен, чтобы не генерировать исключения
 //TODO: - сделать возможность считывать уже открытую в Компасе активную сборку
 //TODO: - копирование файлов в такие же подпапки как в окружении изначальной сборки, а может быть по какому-то специальному правилу
@@ -26,15 +28,13 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private string _title = "Архив";
 	private string? _status;
-	private UserControl? _currentControl;
 	private readonly IFileService _fileService;
 	private readonly IRegistryService _registryService;
 	private string _kompasButtonName;
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
-	private readonly UserControl? _componentListControl;
 	private bool _isKompasButtonEnabled;
-	private bool _isReqauringKompasButtonsEnabled;
+	private bool _isRequaringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
 	private ObservableCollection<ComponentModel>? _componentList;
@@ -163,10 +163,10 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	
 	public bool IsReqauringKompasButtonsEnabled
 	{
-		get => _isReqauringKompasButtonsEnabled;
+		get => _isRequaringKompasButtonsEnabled;
 		set
 		{
-			_isReqauringKompasButtonsEnabled = value;
+			_isRequaringKompasButtonsEnabled = value;
 			NotifyPropertyChanged(nameof(IsReqauringKompasButtonsEnabled));
 		}
 	}
