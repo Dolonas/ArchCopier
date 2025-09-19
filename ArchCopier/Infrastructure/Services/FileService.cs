@@ -45,7 +45,7 @@ public class FileService : IFileService
 		return ofd.FileName;
 	}
 	
-	public int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory)
+	public int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory,  Action<int> calculateProgress)
 	{
 		int countOfFiles = 0;
 		if (!Directory.Exists(arhDirectory))
@@ -60,7 +60,7 @@ public class FileService : IFileService
 			if(!File.Exists(newFileName))
 			{
 				File.Copy(fName, newFileName);
-				countOfFiles++;
+				calculateProgress(++countOfFiles);
 			}
 		}
 		return countOfFiles;

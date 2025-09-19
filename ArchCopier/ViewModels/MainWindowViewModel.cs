@@ -14,10 +14,8 @@ using ArchCopier.Views;
 using Serilog;
 // ReSharper disable InconsistentNaming
 
-//TODO: - сделать отображаемым список с компонентами - похоже на то, что коллектион модель обновляется, а список во вьюхе - нет. можно посмотреть на события
 //TODO: - сделать отбор оригинальных компонентов прямо в componentCollection по linq
 //TODO: - сделать неактивными кнопки "прочитать сборку" и др., если компас не подключен, чтобы не генерировать исключения
-//TODO: - сделать возможность считывать уже открытую в Компасе активную сборку
 //TODO: - копирование файлов в такие же подпапки как в окружении изначальной сборки, а может быть по какому-то специальному правилу
 
 namespace ArchCopier.ViewModels;
@@ -42,9 +40,10 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private Settings? _currentSettings;
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
 	private readonly ILogger _logger;
-	private Visibility _progressBarVisibility;
-	
 	private Kompas3D KompasInstance { get; }
+	
+	private double _progress;
+	private Visibility _progressBarVisibility;
 	
 	private void NotifyPropertyChanged(string propertyName)
 	{
@@ -64,6 +63,16 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	{
 		get => _title;
 		set => Set(ref _title, value);
+	}
+	
+	public double Progress
+	{
+		get => _progress;
+		set
+		{
+			Set(ref _progress, value);
+			NotifyPropertyChanged(nameof(Progress));
+		}
 	}
 	public string? KompasButtonName
 	{
@@ -113,16 +122,20 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 	}
 
-	public ComponentCollectionModel ComponentCollection
+	private ComponentCollectionModel ComponentCollection
 	{
-		get => _componentCollection;
+		get
+		{
+			if (_componentCollection != null) return _componentCollection;
+			return _componentCollection = new ComponentCollectionModel(new List<ComponentModel>());
+		}
 		set
 		{
 			_componentCollection = value;
 			NotifyPropertyChanged(nameof(ListComponents));
 		}
 	}
-	
+
 	public ObservableCollection<ComponentModel> ListComponents => ComponentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
 
 	public ComponentModel? SelectedComponent
@@ -363,14 +376,11 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
+		ProgressBarVisibility = Visibility.Visible;
 		var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
-			ArhDirectory);
-		if (result == 0)
-			Status = "Файлы не скопированы по неизвестной причине";
-		else
-		{
-			Status = $"{result} файлов скопировано в папку архива";
-		}
+			ArhDirectory, CalculateProgress);
+		Status = result == 0 ? "Файлы не скопированы по неизвестной причине" : $"{result} файлов скопировано в папку архива";
+		ProgressBarVisibility = Visibility.Hidden;
 	}
 
 	#endregion
@@ -748,6 +758,11 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		_logger.Information($"UserDomainName: {Environment.UserDomainName}");
 		
 		_logger.Information($"UserName: {Environment.UserName}");
+	}
+
+	private void CalculateProgress(int count)
+	{
+		Progress += 100 / (double)count;
 	}
 	
 }
