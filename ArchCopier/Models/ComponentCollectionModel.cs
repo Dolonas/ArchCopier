@@ -14,14 +14,24 @@ public class ComponentCollectionModel : ViewModel, IEntity
 
     public ComponentCollectionModel()
     {
-        _components = new ObservableCollection<ComponentModel> { new ComponentModel() };
-        _selectedComponent = _components[0];
+        ComponentCollection = new ObservableCollection<ComponentModel> { new ComponentModel() };
+        _selectedComponent = ComponentCollection[0];
     }
 
     public ComponentModel? SelectedComponent
     {
         get => _selectedComponent;
         set => _selectedComponent = value;
+    } 
+    
+    public int NumOfOriginalComponents
+    {
+        get
+        {
+            if (ComponentCollection != null)
+                return ComponentCollection.Where(c => !c.IsStandart).Select(c => c.FullFileName).Distinct().Count();
+            return 0;
+        }
     }
 
     public ObservableCollection<ComponentModel>? ComponentCollection
@@ -35,15 +45,15 @@ public class ComponentCollectionModel : ViewModel, IEntity
         int result = 0;
         if (components!.Count > 0)
         {
-            _components = components;
-            result = _components.Where(c => !c.IsStandart).Select(c => c.ShortFileName).Distinct().Count();
+            ComponentCollection = components;
+            result = ComponentCollection.Where(c => !c.IsStandart).Select(c => c.ShortFileName).Distinct().Count();
         }
         else
         {
-            _components = new ObservableCollection<ComponentModel> { new("Пусто") };
+            ComponentCollection = new ObservableCollection<ComponentModel> { new("Пусто") };
             result = 0;
         }
-        SelectedComponent = _components?[0];
+        SelectedComponent = ComponentCollection[0];
         return result;
     }
 	
@@ -55,13 +65,13 @@ public class ComponentCollectionModel : ViewModel, IEntity
 
     public void RemoveComponent(ComponentModel deletingFile)
     {
-        if (_components != null && _selectedComponent != deletingFile)
-            _components.Remove(deletingFile);
+        if (ComponentCollection != null && _selectedComponent != deletingFile)
+            ComponentCollection.Remove(deletingFile);
     }
 
     public ObservableCollection<ComponentModel>? GetComponentList()
     {
-        return _components ?? null;
+        return ComponentCollection ?? null;
     }
 
     public ComponentModel? GetSelectedFile()

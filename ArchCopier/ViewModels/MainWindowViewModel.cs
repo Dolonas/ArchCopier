@@ -32,7 +32,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private readonly IRegistryService _registryService;
 	private string _kompasButtonName;
 	private string _runButtonName;
-	private readonly ComponentCollectionModel? _componentCollection;
+	private ComponentCollectionModel? _componentCollection;
 	private bool _isKompasButtonEnabled;
 	private bool _isRequaringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
@@ -113,7 +113,17 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		}
 	}
 
-	public ObservableCollection<ComponentModel>? ComponentList => _componentCollection?.GetComponentList();
+	public ComponentCollectionModel ComponentCollection
+	{
+		get => _componentCollection;
+		set
+		{
+			_componentCollection = value;
+			NotifyPropertyChanged(nameof(_componentCollection));
+		}
+	}
+	
+	public ObservableCollection<ComponentModel> ListComponents => ComponentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
 
 	public ComponentModel? SelectedComponent
 	{
@@ -353,7 +363,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
-		if (ComponentList is not null)
+		if (ComponentCollection is not null)
 		{
 			var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
 				ArhDirectory);
@@ -380,7 +390,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var result = _componentCollection?.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
+		var r = KompasInstance.GetAllPartsOfActiveAssembly();
+		ComponentCollection.SetComponents(r);
+		var result = ComponentCollection.NumOfOriginalComponents;
 		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 	}
 
@@ -538,7 +550,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			ComponentCollection = new ObservableCollection<ComponentModel>(
 				new ComponentModel[]{new ComponentModel("один", "один"), new ComponentModel("два", "два")})
 		};
-		SelectedComponent = ComponentList?[0];
+		SelectedComponent = ComponentCollection?.GetComponentList()[0];
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
 		_fileService.CurrentDirectory = currentDirectory;
