@@ -14,7 +14,7 @@ using ArchCopier.Views;
 using Serilog;
 // ReSharper disable InconsistentNaming
 
-//TODO: - сделать отображаемым список с компонентами
+//TODO: - сделать отображаемым список с компонентами - похоже на то, что коллектион модель обновляется, а список во вьюхе - нет. можно посмотреть на события
 //TODO: - сделать отбор оригинальных компонентов прямо в componentCollection по linq
 //TODO: - сделать неактивными кнопки "прочитать сборку" и др., если компас не подключен, чтобы не генерировать исключения
 //TODO: - сделать возможность считывать уже открытую в Компасе активную сборку
@@ -32,12 +32,11 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private readonly IRegistryService _registryService;
 	private string _kompasButtonName;
 	private string _runButtonName;
-	private ComponentCollectionModel? _componentCollection;
+	private readonly ComponentCollectionModel? _componentCollection;
 	private bool _isKompasButtonEnabled;
 	private bool _isRequaringKompasButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
-	private ObservableCollection<ComponentModel>? _componentList;
 	private ComponentModel? _selectedComponent;
 	private readonly string _nameOfFileSettings;
 	private Settings? _currentSettings;
@@ -113,21 +112,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			NotifyPropertyChanged(nameof(ArhDirectory));
 		}
 	}
-	
-	public ObservableCollection<ComponentModel>? ComponentList
-	{
-		get
-		{
-			if (_componentCollection != null) return _componentCollection.ComponentCollection;
-			return new ObservableCollection<ComponentModel>();
-		}
-		set
-		{
-			if (_componentCollection != null) _componentCollection.SetComponents(value);
-			if (value is null) _componentList = new ObservableCollection<ComponentModel>(value);
-			OnPropertyChanged();
-		}
-	}
+
+	public ObservableCollection<ComponentModel>? ComponentList => _componentCollection?.GetComponentList();
 
 	public ComponentModel? SelectedComponent
 	{
@@ -394,8 +380,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		ComponentList = KompasInstance.GetAllPartsOfActiveAssembly();
-		Status = ComponentList.Count > 0 ? $"Сборка прочитана, в ней найдено {ComponentList.Count} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		var result = _componentCollection?.SetComponents(KompasInstance.GetAllPartsOfActiveAssembly());
+		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 	}
 
 	#endregion
@@ -547,9 +533,12 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		KompasInstance = new Kompas3D(_logger);
 		KompasButtonName = "Запустить/Проверить Компас";
 		RunButtonName = "Прочитать сборку";
-		_componentCollection = new ComponentCollectionModel();
-		ComponentList = _componentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
-		SelectedComponent = _componentList?[0];
+		_componentCollection = new ComponentCollectionModel
+		{
+			ComponentCollection = new ObservableCollection<ComponentModel>(
+				new ComponentModel[]{new ComponentModel("один", "один"), new ComponentModel("два", "два")})
+		};
+		SelectedComponent = ComponentList?[0];
 		IsKompasButtonEnabled = true;
 		IsReqauringKompasButtonsEnabled = true;
 		_fileService.CurrentDirectory = currentDirectory;
