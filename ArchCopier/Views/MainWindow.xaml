@@ -136,7 +136,7 @@
             <DockPanel LastChildFill="True" Margin="0 0 0 0">
                 <GroupBox DockPanel.Dock="Top" Width="auto" Height="auto" Header="Список компонентов сборки">
                     <ListBox ItemsSource="{Binding ListComponents}" DisplayMemberPath="ShortFileName"
-                             SelectedItem="{Binding SelectedComponent, Mode=TwoWay}">
+                             SelectedItem="{Binding SelectedComponent, Mode=OneWay}">
                     </ListBox>
                 </GroupBox>
             </DockPanel>

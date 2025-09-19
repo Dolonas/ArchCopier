@@ -119,7 +119,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		set
 		{
 			_componentCollection = value;
-			NotifyPropertyChanged(nameof(_componentCollection));
+			NotifyPropertyChanged(nameof(ListComponents));
 		}
 	}
 	
@@ -363,16 +363,13 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
-		if (ComponentCollection is not null)
+		var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
+			ArhDirectory);
+		if (result == 0)
+			Status = "Файлы не скопированы по неизвестной причине";
+		else
 		{
-			var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
-				ArhDirectory);
-			if (result == 0)
-				Status = "Файлы не скопированы по неизвестной причине";
-			else
-			{
-				Status = $"{result} файлов скопировано в папку архива";
-			}
+			Status = $"{result} файлов скопировано в папку архива";
 		}
 	}
 
@@ -390,10 +387,37 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var r = KompasInstance.GetAllPartsOfActiveAssembly();
-		ComponentCollection.SetComponents(r);
-		var result = ComponentCollection.NumOfOriginalComponents;
-		Status = result > 0 ? $"Сборка прочитана, в ней найдено {result} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		var parts = KompasInstance.GetAllPartsOfActiveAssembly();
+		ComponentCollection = new ComponentCollectionModel(parts.ToList());
+		var numOfComponents = ComponentCollection.NumOfOriginalComponents;
+		Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+	}
+	
+	#endregion
+	
+	
+	#region ReadActiveAssemblyCommand
+
+	public ICommand ReadActiveAssemblyCommand { get; }
+
+	private bool CanReadActiveAssemblyExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnReadActiveAssemblyExecuted(object p)
+	{
+		var resultOfGettingActiveAssembly = KompasInstance.GetActive3DDocument();
+		if (resultOfGettingActiveAssembly == 3)
+		{
+			ComponentCollection = new ComponentCollectionModel(KompasInstance.GetAllPartsOfActiveAssembly().ToList());
+			Status = ComponentCollection.NumOfOriginalComponents > 0 ? $"Сборка прочитана, в ней найдено {ComponentCollection.NumOfOriginalComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		}
+		else
+		{
+			Status = $"Активная сборка Компаса не найдена";
+		}
+		
 	}
 
 	#endregion
@@ -594,6 +618,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		ReadAssemblyCommand =
 			new LambdaCommand(OnReadAssemblyExecuted, CanReadAssemblyExecute);
+		
+		ReadActiveAssemblyCommand =
+			new LambdaCommand(OnReadActiveAssemblyExecuted, CanReadActiveAssemblyExecute);
 		
 		GetHelpCommand =
 			new LambdaCommand(OnGetHelpExecuted, CanGetHelpExecute);

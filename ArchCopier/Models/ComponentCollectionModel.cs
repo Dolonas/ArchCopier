@@ -17,6 +17,12 @@ public class ComponentCollectionModel : ViewModel, IEntity
         ComponentCollection = new ObservableCollection<ComponentModel> { new ComponentModel() };
         _selectedComponent = ComponentCollection[0];
     }
+    
+    public ComponentCollectionModel(List<ComponentModel> components)
+    {
+        ComponentCollection = new ObservableCollection<ComponentModel> (components);
+        _selectedComponent = ComponentCollection[0];
+    }
 
     public ComponentModel? SelectedComponent
     {

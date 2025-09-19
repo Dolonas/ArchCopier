@@ -132,12 +132,17 @@ public class Kompas3D : IEntity
 	public int GetActive3DDocument()
 	{
 		AssignActiveDocumentType();
-		if(_kompas7 is not null && _activeDocumentType is DocType.Assembly or DocType.Part)
+		if(_kompas7 is null)
+			return 0;
+		_partOrAssembly = (IKompasDocument3D)_kompas7.ActiveDocument;
+		switch (_activeDocumentType)
 		{
-			_partOrAssembly = (IKompasDocument3D)_kompas7.ActiveDocument;
-			return 1;
+			case DocType.Part:
+				return 2;
+			case DocType.Assembly:
+				return 3;
 		}
-		return 0;
+		return 1;
 	}
 	
 	public void GetAllComponentsByRecursion(IPart7 part, List<IPart7> parts)
