@@ -100,7 +100,7 @@
                     Margin="5 0 0 0 "
                     Content="Выбрать сборку"
                     Command="{Binding ChooseAssemblyCommand}"
-                    IsEnabled="{Binding IsReqauringKompasButtonsEnabled}"
+                    IsEnabled="True"
                     Style="{StaticResource MaterialDesignPaperButton}"
                     ToolTip="Выбрать головную сборку проекта" />
             </DockPanel>
@@ -127,7 +127,7 @@
                     Margin="5 0 0 0 "
                     Content="Выбрать архив"
                     Command="{Binding OpenArchDirectoryCommand}"
-                    IsEnabled="{Binding IsReqauringKompasButtonsEnabled}"
+                    IsEnabled="True"
                     Style="{StaticResource MaterialDesignPaperButton}"
                     ToolTip="Выбрать папку назначения архива" />
             </DockPanel>
@@ -160,7 +160,7 @@
                 <Button Width="217"
                         Command="{Binding ReadAssemblyCommand}"
                         Content="{Binding RunButtonName}"
-                        IsEnabled="{Binding IsReqauringKompasButtonsEnabled}"
+                        IsEnabled="{Binding IsWorkButtonsEnabled}"
                         Style="{StaticResource MaterialDesignPaperButton}"
                         ToolTip="Обработать чертежи" />
             </DockPanel>
@@ -171,13 +171,14 @@
                         HorizontalAlignment="Left"
                         Command="{Binding ReadActiveAssemblyCommand}"
                         Content="Прочитать акт. сборку"
-                        IsEnabled="{Binding IsReqauringKompasButtonsEnabled}"
+                        IsEnabled="{Binding IsButtonOfActiveDocumentEnabled}"
                         Style="{StaticResource MaterialDesignPaperButton}"
                         ToolTip="Прочитать активную открытую сборку в Компасе" />
                 <Button Width="217"
                         Command="{Binding CopyFilesOfComponentsToArchDirectoryCommand}"
                         Content="Выгрузить в архив"
                         Style="{StaticResource MaterialDesignPaperButton}"
+                        IsEnabled="{Binding IsArchUploadButtonsEnabled}"
                         ToolTip="Копирование файлов компонентов в выбранную папку архива" />
             </DockPanel>
         </StackPanel>

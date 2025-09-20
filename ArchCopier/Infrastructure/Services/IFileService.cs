@@ -12,7 +12,7 @@ public interface IFileService
 	string ChooseFile(string? pathToDirectory, string filterByExtension);
 	string ChooseDirectory();
 	string ChooseDirectory(string? pathToDirectory);
-	int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory, Action<int> calculateProgress);
+	int CopyFiles(List<string> listOfFullNamesOfFiles, string arhDirectory);
 	string ReadFileWithDialog(string pathToDirectory, string filterByExtension);
 	string ReadFileToString(string fileName);
 	void WriteFileWithDialog(string pathToDirectory, string txtIntoFile, string filterByExtension);

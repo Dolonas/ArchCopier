@@ -24,7 +24,7 @@ public class ComponentCollectionModel : ViewModel, IEntity
         _selectedComponent = ComponentCollection[0];
     }
 
-    public ComponentModel? SelectedComponent
+    private ComponentModel? SelectedComponent
     {
         get => _selectedComponent;
         set => _selectedComponent = value;

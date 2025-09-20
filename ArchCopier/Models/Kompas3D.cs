@@ -126,7 +126,8 @@ public class Kompas3D : IEntity
 		IPart7 part = _partOrAssembly.TopPart;
 		List<IPart7> parts = new List<IPart7>();
 		GetAllComponentsByRecursion(part, parts);
-		return ConvertIPartListToNormalStringCollection(parts);
+		var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
+		return ConvertIPartListToNormalStringCollection(originalsParts);
 	}
 
 	public int GetActive3DDocument()

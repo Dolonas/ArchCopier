@@ -3,14 +3,12 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using ArchCopier.Infrastructure.Commands;
 using ArchCopier.Infrastructure.Services;
 using ArchCopier.Infrastructure.Utilities;
 using ArchCopier.ViewModels.Base;
 using ArchCopier.Models;
-using ArchCopier.Views;
 using Serilog;
 // ReSharper disable InconsistentNaming
 
@@ -31,7 +29,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
 	private bool _isKompasButtonEnabled;
-	private bool _isRequaringKompasButtonsEnabled;
+	private bool _isWorkButtonsEnabled;
+	private bool _isButtonOfActiveDocumentEnabled;
+	private bool _isArchUploadButtonsEnabled;
 	private string _fullNameOfCurrentAssembly;
 	private string _arhDirectory;
 	private ComponentModel? _selectedComponent;
@@ -98,6 +98,15 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		{
 			_isKompasButtonEnabled = value;
 			NotifyPropertyChanged(nameof(IsKompasButtonEnabled));
+		}
+	}
+	public bool IsButtonOfActiveDocumentEnabled
+	{
+		get => _isButtonOfActiveDocumentEnabled;
+		set
+		{
+			_isButtonOfActiveDocumentEnabled = value;
+			NotifyPropertyChanged(nameof(IsButtonOfActiveDocumentEnabled));
 		}
 	}
 	
@@ -170,13 +179,23 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	
 	
-	public bool IsReqauringKompasButtonsEnabled
+	public bool IsWorkButtonsEnabled
 	{
-		get => _isRequaringKompasButtonsEnabled;
+		get => _isWorkButtonsEnabled;
 		set
 		{
-			_isRequaringKompasButtonsEnabled = value;
-			NotifyPropertyChanged(nameof(IsReqauringKompasButtonsEnabled));
+			_isWorkButtonsEnabled = value;
+			NotifyPropertyChanged(nameof(IsWorkButtonsEnabled));
+		}
+	}
+	
+	public bool IsArchUploadButtonsEnabled
+	{
+		get => _isArchUploadButtonsEnabled;
+		set
+		{
+			_isArchUploadButtonsEnabled = value;
+			NotifyPropertyChanged(nameof(IsArchUploadButtonsEnabled));
 		}
 	}
 	
@@ -211,12 +230,16 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 				else
 					Status = "Компас запущен";
 			}
-			SetKompasAndWorkButtonsStatus(kompasByteStatus);
+
+			if (kompasByteStatus == 2 && KompasInstance.GetActive3DDocument() == 3)
+				IsButtonOfActiveDocumentEnabled = true;
+			SetKompasButtonStatus(kompasByteStatus);
 		});
 	}
 
 	#endregion
-		#region CheckKompasInstallCommand
+	
+	#region CheckKompasInstallCommand
 
 	public ICommand CheckKompasInstallCommand { get; }
 
@@ -235,7 +258,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			2 => "Компас установлен и запущен",
 			_ => "Компас не установлен"
 		};
-		SetKompasAndWorkButtonsStatus(
+		SetKompasButtonStatus(
 			kompasByteStatus); // установка того, какие кнопки становятся активны, а какие - нет
 	}
 
@@ -325,7 +348,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			Status = $"Файл или не выбран или не существует";
 			return;
 		}
-		KompasInstance.OpenComponent(FullNameOfCurrentAssembly);
+		Status = $"Сборка открывается";
+		Task.Run(() => { KompasInstance.OpenComponent(FullNameOfCurrentAssembly); });
+		IsWorkButtonsEnabled = true;
 		Status = $"Сборка открыта";
 	}
 
@@ -377,10 +402,16 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
 		ProgressBarVisibility = Visibility.Visible;
-		var result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
-			ArhDirectory, CalculateProgress);
-		Status = result == 0 ? "Файлы не скопированы по неизвестной причине" : $"{result} файлов скопировано в папку архива";
-		ProgressBarVisibility = Visibility.Hidden;
+		var result = 0;
+		Status = "Файлы копируются...";
+		Task.Run(() =>
+		{
+			result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
+				ArhDirectory);
+			Status = result == 0 ? "Файлы не скопированы по неизвестной причине" : $"{result} файлов скопировано в папку архива";
+			ProgressBarVisibility = Visibility.Hidden;
+		});
+		
 	}
 
 	#endregion
@@ -397,10 +428,16 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var parts = KompasInstance.GetAllPartsOfActiveAssembly();
-		ComponentCollection = new ComponentCollectionModel(parts.ToList());
-		var numOfComponents = ComponentCollection.NumOfOriginalComponents;
-		Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+		var parts = ComponentCollection.ComponentCollection;
+		Task.Run(() =>
+		{
+			Status = "Сборка читается...";
+			parts = KompasInstance.GetAllPartsOfActiveAssembly();
+			if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
+			var numOfComponents = ComponentCollection.NumOfOriginalComponents;
+			Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+			IsArchUploadButtonsEnabled = true;
+		});
 	}
 	
 	#endregion
@@ -417,17 +454,26 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadActiveAssemblyExecuted(object p)
 	{
+		
 		var resultOfGettingActiveAssembly = KompasInstance.GetActive3DDocument();
+		var parts = ComponentCollection.ComponentCollection;
 		if (resultOfGettingActiveAssembly == 3)
 		{
-			ComponentCollection = new ComponentCollectionModel(KompasInstance.GetAllPartsOfActiveAssembly().ToList());
-			Status = ComponentCollection.NumOfOriginalComponents > 0 ? $"Сборка прочитана, в ней найдено {ComponentCollection.NumOfOriginalComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+			Task.Run(() =>
+			{
+				Status = "Сборка читается...";
+				parts = KompasInstance.GetAllPartsOfActiveAssembly();
+				if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
+				var numOfComponents = ComponentCollection.NumOfOriginalComponents;
+				Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
+				IsArchUploadButtonsEnabled = true;
+			});
+			
 		}
 		else
 		{
 			Status = $"Активная сборка Компаса не найдена";
 		}
-		
 	}
 
 	#endregion
@@ -540,8 +586,6 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	#endregion
 	
-
-	
 	
 	#region CloseApplicationCommand
 	
@@ -583,15 +627,18 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			ComponentCollection = new ObservableCollection<ComponentModel>(
 				new ComponentModel[]{new ComponentModel("один", "один"), new ComponentModel("два", "два")})
 		};
-		SelectedComponent = ComponentCollection?.GetComponentList()[0];
+		SelectedComponent = ComponentCollection?.GetComponentList()?[0];
+		_componentCollection.PropertyChanged += Model_PropertyChanged;
 		IsKompasButtonEnabled = true;
-		IsReqauringKompasButtonsEnabled = true;
+		IsWorkButtonsEnabled = false;
+		IsArchUploadButtonsEnabled = false;
+		IsButtonOfActiveDocumentEnabled = false;
 		_fileService.CurrentDirectory = currentDirectory;
 		_fileService.ArrayOfMasks = new[] { ".a3d" };
 		FullNameOfCurrentAssembly = "Сборка";
 		ArhDirectory = "Путь к архиву";
 		Status = GetStatusFromResult(KompasInstance.TryGetActiveKompas());
-		ProgressBarVisibility = Visibility.Visible;
+		ProgressBarVisibility = Visibility.Hidden;
 		
 		#region Commands
 
@@ -675,7 +722,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			return Path.GetFullPath(_pathToThisAppDirectory + @"..\..\..\..\ArchCopier\Resources\Help"); //вариант номер два, если приложение отлаживается из IDE
 	}
 	
-	private void SetKompasAndWorkButtonsStatus(byte kompasByteStatus)
+	private void SetKompasButtonStatus(byte kompasByteStatus)
 	{
 		switch (kompasByteStatus)
 		{
@@ -684,13 +731,10 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 					"Запустить/Проверить Компас";
 				IsKompasButtonEnabled =
 					true; // если Компас установлен, но не запущен, то будет гореть кнопка с этой надписью, с предложением запустить таки Компас 
-				IsReqauringKompasButtonsEnabled =
-					false; // если Компас не запущен, то WorkButtons нет необходимости нажимать
 				break;
 			case 2:
 				KompasButtonName = "Компас запущен";
 				IsKompasButtonEnabled = false; // если Компас уже запущен, то кнопка неактивна
-				IsReqauringKompasButtonsEnabled = true; // если Компас запущен, то WorkButtons можно и нажать
 				break;
 			default:
 				KompasButtonName = "Проверить Компас";
