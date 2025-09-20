@@ -27,7 +27,6 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _title = "Архив";
 	private string? _status;
 	private readonly IFileService _fileService;
-	private readonly IRegistryService _registryService;
 	private string _kompasButtonName;
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
@@ -158,6 +157,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			NotifyPropertyChanged(nameof(CurrentSettings));
 		}
 	}
+	
 	public Visibility ProgressBarVisibility
 	{
 		get => _progressBarVisibility;
@@ -561,7 +561,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	
 	#endregion
 
-	public MainWindowViewModel(IFileService fileService, IRegistryService registryService)
+	public MainWindowViewModel(IFileService fileService)
 	{
 		Title = $"Загрузчик архива v {Assembly.GetExecutingAssembly().GetName().Version} betta";
 		_logger = new LoggerConfiguration()  
@@ -571,7 +571,6 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		WriteEnvironmentVariablesToLog();
 		var currentDirectory = GetStartDirectory();
 		_fileService = fileService;
-		_registryService = registryService;
 		_nameOfFileSettings = Path.Combine(_pathToThisAppDirectory, @"Resources\Settings\settings.json" );
 		CurrentSettings = GetSettingsFromFile(_nameOfFileSettings);
 		if (CurrentSettings is null)
@@ -592,7 +591,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		FullNameOfCurrentAssembly = "Сборка";
 		ArhDirectory = "Путь к архиву";
 		Status = GetStatusFromResult(KompasInstance.TryGetActiveKompas());
-		ProgressBarVisibility = Visibility.Hidden;
+		ProgressBarVisibility = Visibility.Visible;
 		
 		#region Commands
 

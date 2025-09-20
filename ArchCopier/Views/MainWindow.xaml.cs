@@ -12,9 +12,7 @@ public partial class MainWindow
 	{
 		InitializeComponent();
 		
-		DataContext = new MainWindowViewModel(new FileService(string.Empty, new string[] { ".spw" }),
-			new WinRegistryService(Registry.CurrentUser, String.Empty,
-				new RegistryKeyParameters(string.Empty, string.Empty)));
+		DataContext = new MainWindowViewModel(new FileService(string.Empty, new string[] { ".spw" }));
 		Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(Exception1);
 	}
 
