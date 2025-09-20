@@ -129,6 +129,16 @@ public class Kompas3D : IEntity
 		var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
 		return ConvertIPartListToNormalStringCollection(originalsParts);
 	}
+	
+	public GetActiveAssemblyTree(AssemblyTreeModel assemblyTree)
+	{
+		GetActive3DDocument();
+		IPart7 part = _partOrAssembly.TopPart;
+		List<IPart7> parts = new List<IPart7>();
+		GetAssemblyTreeByRecursion(part, assemblyTree);
+		//var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
+		return ConvertIPartListToNormalStringCollection(originalsParts);
+	}
 
 	public int GetActive3DDocument()
 	{
@@ -146,9 +156,18 @@ public class Kompas3D : IEntity
 		return 1;
 	}
 	
-	public void GetAllComponentsByRecursion(IPart7 part, List<IPart7> parts)
+	private void GetAllComponentsByRecursion(IPart7 part, List<IPart7> parts)
 	{
 		parts.Add(part);
+		foreach (IPart7 item in part.Parts)
+		{
+			if(item.Detail == true) parts.Add(item);
+			if(item.Detail == false) GetAllComponentsByRecursion(item, parts);
+		}
+	}
+	private void GetAssemblyTreeByRecursion(IPart7 part, AssemblyTreeModel assemblyTree)
+	{
+		assemblyTree.Children.InsertNode(part, assemblyTree);
 		foreach (IPart7 item in part.Parts)
 		{
 			if(item.Detail == true) parts.Add(item);

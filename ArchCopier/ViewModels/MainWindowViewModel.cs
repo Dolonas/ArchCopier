@@ -28,6 +28,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _kompasButtonName;
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
+	private AssemblyTreeModel _assemblyTree;
 	private bool _isKompasButtonEnabled;
 	private bool _isWorkButtonsEnabled;
 	private bool _isButtonOfActiveDocumentEnabled;
@@ -140,6 +141,19 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		set
 		{
 			_componentCollection = value;
+			NotifyPropertyChanged(nameof(ListComponents));
+		}
+	}
+	private AssemblyTreeModel AssemblyTree
+	{
+		get
+		{
+			if (_assemblyTree != null) return _assemblyTree;
+			return _assemblyTree = new AssemblyTreeModel();
+		}
+		set
+		{
+			_assemblyTree = value;
 			NotifyPropertyChanged(nameof(ListComponents));
 		}
 	}
@@ -457,12 +471,14 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		var resultOfGettingActiveAssembly = KompasInstance.GetActive3DDocument();
 		var parts = ComponentCollection.ComponentCollection;
+		var treeOfParts = _assemblyTree;
 		if (resultOfGettingActiveAssembly == 3)
 		{
 			Task.Run(() =>
 			{
 				Status = "Сборка читается...";
 				parts = KompasInstance.GetAllPartsOfActiveAssembly();
+				treeOfParts = KompasInstance.GetActiveAssemblyTree();
 				if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
 				var numOfComponents = ComponentCollection.NumOfOriginalComponents;
 				Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
@@ -629,6 +645,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		};
 		SelectedComponent = ComponentCollection?.GetComponentList()?[0];
 		_componentCollection.PropertyChanged += Model_PropertyChanged;
+		_assemblyTree =  new AssemblyTreeModel();
+		_assemblyTree.PropertyChanged += Model_PropertyChanged;
 		IsKompasButtonEnabled = true;
 		IsWorkButtonsEnabled = false;
 		IsArchUploadButtonsEnabled = false;
