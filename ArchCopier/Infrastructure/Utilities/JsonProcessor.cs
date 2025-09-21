@@ -52,4 +52,14 @@ public class JsonProcessor
 				Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
 			});
 	}
+	
+	public static string SerialiseJSON(object obj)
+	{
+		return JsonSerializer.Serialize(obj,
+			new JsonSerializerOptions
+			{
+				WriteIndented = true,
+				Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
+			});
+	}
 }

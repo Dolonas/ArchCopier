@@ -1,14 +1,18 @@
+using ArchCopier.ViewModels.Base;
+using Kompas6API3D5COM;
 using Kompas6API5;
+using KompasAPI7;
 
 namespace ArchCopier.Models;
 
-public class Node
+public class Node : ViewModel
 {
-    public part Value { get; set; }
+    public int Id { get; set; }
+    public IPart7 Value { get; set; }
     public Node Parent { get; set; }
     public List<Node> Children { get; set; }
     
-    public Node(part value, Node parent)
+    public Node(IPart7 value, Node parent)
     {
         Value = value;
         Parent = parent;
@@ -44,7 +48,7 @@ public class Node
         }
     }
     
-    public Node InsertNode(part value, Node parent) 
+    public Node InsertNode(IPart7 value, Node parent) 
     {
         Node newNode = new Node(value, parent);
         parent.Children.Add(newNode);

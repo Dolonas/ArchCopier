@@ -1,23 +1,19 @@
 using ArchCopier.Models.Interfaces;
 using ArchCopier.ViewModels.Base;
 using Kompas6API5;
+using KompasAPI7;
 
 namespace ArchCopier.Models;
 
-public class AssemblyTreeModel: ViewModel, IEntity
+public class AssemblyTreeModel: Node, IEntity
 {
-    public int Id { get; set; }
-    
-    public part Value { get; set; }
-    public Node Children { get; set; }
-
-    public AssemblyTreeModel(part value, Node children)
+    public AssemblyTreeModel(IPart7 value, Node children) : base(value, null)
     {
         Value = value;
-        Children = children;
+        Children = new List<Node>();
     }
 
-    public AssemblyTreeModel() : this(new partClass(), new Node(new partClass(), null))
+    public AssemblyTreeModel() : this(null, null)
     {
             
     }

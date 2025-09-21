@@ -478,7 +478,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			{
 				Status = "Сборка читается...";
 				parts = KompasInstance.GetAllPartsOfActiveAssembly();
-				treeOfParts = KompasInstance.GetActiveAssemblyTree();
+				KompasInstance.GetActiveAssemblyTree(treeOfParts);
+				WriteTreeToJsonFile(treeOfParts);
 				if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
 				var numOfComponents = ComponentCollection.NumOfOriginalComponents;
 				Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
@@ -800,6 +801,14 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		_logger.Information($"Создан файл настроек по пути {newFileName}");
 		return newFileName;
 	}
+	
+	private string WriteTreeToJsonFile(Node node)
+	{
+		var jsonFileInString = JsonProcessor.SerialiseJSON((object)node);
+		var newFileName = _fileService.WriteFile(GenerateFileNameForNodeTree(), jsonFileInString);
+		_logger.Information($"Создан файл дерева сборки по пути {newFileName}");
+		return newFileName;
+	}
 
 	private List<string> ConvertToListString(ObservableCollection<ComponentModel>? collection)
 	{
@@ -825,5 +834,11 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	{
 		Progress += 100 / (double)count;
 	}
+	private string GenerateFileNameForNodeTree()
+	{
+		return Path.Combine(_pathToThisAppDirectory +@"\logs\" +  DateTime.Now.ToString("yyyyMMddHHmmss") + ".asm");
+	}
+	
+	
 	
 }

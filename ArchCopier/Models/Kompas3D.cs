@@ -130,14 +130,12 @@ public class Kompas3D : IEntity
 		return ConvertIPartListToNormalStringCollection(originalsParts);
 	}
 	
-	public GetActiveAssemblyTree(AssemblyTreeModel assemblyTree)
+	public void GetActiveAssemblyTree(AssemblyTreeModel assemblyTree)
 	{
 		GetActive3DDocument();
 		IPart7 part = _partOrAssembly.TopPart;
 		List<IPart7> parts = new List<IPart7>();
 		GetAssemblyTreeByRecursion(part, assemblyTree);
-		//var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
-		return ConvertIPartListToNormalStringCollection(originalsParts);
 	}
 
 	public int GetActive3DDocument()
@@ -165,13 +163,14 @@ public class Kompas3D : IEntity
 			if(item.Detail == false) GetAllComponentsByRecursion(item, parts);
 		}
 	}
-	private void GetAssemblyTreeByRecursion(IPart7 part, AssemblyTreeModel assemblyTree)
+	private void GetAssemblyTreeByRecursion(IPart7 part, Node node)
 	{
-		assemblyTree.Children.InsertNode(part, assemblyTree);
+		var result = new AssemblyTreeModel();
+		node.InsertNode(part, node);
 		foreach (IPart7 item in part.Parts)
 		{
-			if(item.Detail == true) parts.Add(item);
-			if(item.Detail == false) GetAllComponentsByRecursion(item, parts);
+			if(item.Detail == true) result.InsertNode(item, node);
+			if(item.Detail == false) GetAssemblyTreeByRecursion(item, new Node(item.Part, node));
 		}
 	}
 	public void OpenComponent(string fullFileNameOfComponent)
