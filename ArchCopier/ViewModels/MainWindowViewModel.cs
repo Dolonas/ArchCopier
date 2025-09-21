@@ -804,7 +804,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	
 	private string WriteTreeToJsonFile(Node node)
 	{
-		var jsonFileInString = JsonProcessor.SerialiseJSON((object)node);
+		var jsonFileInString = JsonProcessor.SerialiseJSONNode(node);
 		var newFileName = _fileService.WriteFile(GenerateFileNameForNodeTree(), jsonFileInString);
 		_logger.Information($"Создан файл дерева сборки по пути {newFileName}");
 		return newFileName;

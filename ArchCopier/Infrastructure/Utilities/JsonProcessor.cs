@@ -53,9 +53,9 @@ public class JsonProcessor
 			});
 	}
 	
-	public static string SerialiseJSON(object obj)
+	public static string SerialiseJSONNode(Node node)
 	{
-		return JsonSerializer.Serialize(obj,
+		return JsonSerializer.Serialize(node,
 			new JsonSerializerOptions
 			{
 				WriteIndented = true,
