@@ -417,13 +417,23 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private void OnCopyFilesOfComponentsToArchDirectoryExecuted(object p)
 	{
 		ProgressBarVisibility = Visibility.Visible;
-		var result = 0;
+		var resultOfCommonComponentsCopying = 0;
+		var collectionWithoutPurchased = new ObservableCollection<ComponentModel>();
+		if (_componentCollection?.ComponentCollection != null)
+		{
+			collectionWithoutPurchased = new ObservableCollection<ComponentModel>(
+				_componentCollection?.ComponentCollection.Except(_topPurchasedComponentsCollection) ?? Array.Empty<ComponentModel>());
+		}
+
 		Status = "Файлы копируются...";
 		Task.Run(() =>
 		{
-			result = _fileService.CopyFiles(ConvertToListString(_componentCollection?.ComponentCollection),
+			resultOfCommonComponentsCopying = _fileService.CopyFiles(ConvertToListString(collectionWithoutPurchased),
 				ArhDirectory);
-			Status = result == 0 ? "Файлы не скопированы по неизвестной причине" : $"{result} файлов скопировано в папку архива";
+			_fileService.CopyFiles(ConvertToListString(_topPurchasedComponentsCollection),
+				ArhDirectory + @"\Прочие");
+			
+			Status = resultOfCommonComponentsCopying == 0 ? "Файлы не скопированы по неизвестной причине" : $"{resultOfCommonComponentsCopying} файлов скопировано в папку архива";
 			ProgressBarVisibility = Visibility.Hidden;
 		});
 		
@@ -472,7 +482,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	{
 		
 		var resultOfGettingActiveAssembly = KompasInstance.GetActive3DDocument();
-		var parts = ComponentCollection.ComponentCollection;
+		ObservableCollection<ComponentModel>? parts;
 		var treeOfParts = _assemblyTree;
 		if (resultOfGettingActiveAssembly == 3)
 		{
@@ -481,8 +491,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 				Status = "Сборка читается...";
 				parts = KompasInstance.GetAllPartsOfActiveAssembly();
 				KompasInstance.GetActiveAssemblyTree(treeOfParts);
-				WriteTreeToJsonFile(treeOfParts);
+				//WriteTreeToJsonFile(treeOfParts);
 				if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
+				_topPurchasedComponentsCollection = KompasInstance.GetTopPurchasedComponents();
 				var numOfComponents = ComponentCollection.NumOfOriginalComponents;
 				Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
 				IsArchUploadButtonsEnabled = true;
