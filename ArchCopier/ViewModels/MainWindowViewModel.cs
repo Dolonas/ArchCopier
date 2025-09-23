@@ -28,6 +28,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _kompasButtonName;
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
+	private ObservableCollection<ComponentModel> _topPurchasedComponentsCollection;
 	private AssemblyTreeModel _assemblyTree;
 	private bool _isKompasButtonEnabled;
 	private bool _isWorkButtonsEnabled;
@@ -442,11 +443,12 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 
 	private void OnReadAssemblyExecuted(object p)
 	{
-		var parts = ComponentCollection.ComponentCollection;
+		ObservableCollection<ComponentModel>? parts;
 		Task.Run(() =>
 		{
 			Status = "Сборка читается...";
 			parts = KompasInstance.GetAllPartsOfActiveAssembly();
+			_topPurchasedComponentsCollection = KompasInstance.GetTopPurchasedComponents();
 			if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
 			var numOfComponents = ComponentCollection.NumOfOriginalComponents;
 			Status = numOfComponents > 0 ? $"Сборка прочитана, в ней найдено {numOfComponents} оригинальных компонентов" : "Сборка прочитана, но она пуста";
@@ -644,6 +646,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			ComponentCollection = new ObservableCollection<ComponentModel>(
 				new ComponentModel[]{new ComponentModel("один", "один"), new ComponentModel("два", "два")})
 		};
+		_topPurchasedComponentsCollection = new ObservableCollection<ComponentModel>();
 		SelectedComponent = ComponentCollection?.GetComponentList()?[0];
 		_componentCollection.PropertyChanged += Model_PropertyChanged;
 		_assemblyTree =  new AssemblyTreeModel();

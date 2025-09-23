@@ -127,7 +127,20 @@ public class Kompas3D : IEntity
 		List<IPart7> parts = new List<IPart7>();
 		GetAllComponentsByRecursion(part, parts);
 		var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
-		return ConvertIPartListToNormalStringCollection(originalsParts);
+		return ConvertIPartListToNormalComponentCollection(originalsParts);
+	}
+	public ObservableCollection<ComponentModel> GetTopPurchasedComponents()
+	{
+		GetActive3DDocument();
+		IPart7 part = _partOrAssembly.TopPart;
+		List<IPart7> parts = new List<IPart7>();
+		parts.Add(part);
+		foreach (IPart7 item in part.Parts)
+		{
+			if(item.Detail == true) parts.Add(item);
+		}
+		var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
+		return ConvertIPartListToNormalComponentCollection(originalsParts);
 	}
 	
 	public void GetActiveAssemblyTree(AssemblyTreeModel assemblyTree)
@@ -231,12 +244,13 @@ public class Kompas3D : IEntity
 		}
 	}
 
-	private ObservableCollection<ComponentModel> ConvertIPartListToNormalStringCollection(List<IPart7> innerList)
+	private ObservableCollection<ComponentModel> ConvertIPartListToNormalComponentCollection(List<IPart7> innerList)
 	{
 		var result = new ObservableCollection<ComponentModel>();
 		foreach (var p in innerList)
 			result.Add(new ComponentModel(p));
 		return result;
 	}
+	
 
 }
