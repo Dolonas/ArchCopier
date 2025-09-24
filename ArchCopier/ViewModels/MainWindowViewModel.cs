@@ -14,7 +14,7 @@ using Serilog;
 
 //TODO: - напоминалка:  в данной версии проекта 0.1.0.0 детали для копирования в подпапку отбираются не по критерию "покупное" а по критерию "деталь верхнего уровня" 
 //TODO: - напоминалка:  не все свойства IPart7 сейчас перетекают в ComponentView. Переносится только имя файла
-//TODO: - напоминалка:  перед собой на 23 сентрября 2025 года ставлю задачу переноса некоторых компонентов в поддиректории и перепрописывание ссылок на них в сборке с новыми путями
+//TODO: - напоминалка:  перед собой на 23 сентября 2025 года ставлю задачу переноса некоторых компонентов в поддиректории и перепрописывание ссылок на них в сборке с новыми путями
 //TODO: - если поддиректории не существует, то файлменеджер молча возвращает 0. сделать дописывание директорий по принудительному ключу
 //TODO: - сделать отбор оригинальных компонентов прямо в componentCollection по linq
 //TODO: - сделать неактивными кнопки "прочитать сборку" и др., если компас не подключен, чтобы не генерировать исключения
@@ -436,7 +436,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 				ArhDirectory);
 			_fileService.CopyFiles(ConvertToListString(_topPurchasedComponentsCollection),
 				ArhDirectory + @"\Прочие");
-			
+			KompasInstance.RewriteReferencesInAssembly(ComponentCollection.GetComponentList());
 			Status = resultOfCommonComponentsCopying == 0 ? "Файлы не скопированы по неизвестной причине" : $"{resultOfCommonComponentsCopying} файлов скопировано в папку архива";
 			ProgressBarVisibility = Visibility.Hidden;
 		});

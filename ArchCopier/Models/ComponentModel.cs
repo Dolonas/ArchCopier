@@ -7,7 +7,7 @@ namespace ArchCopier.Models;
 public class ComponentModel : IEntity
 {
 	public int Id { get; set; }
-	public string? ComponentDesignation { get; init; }
+	public string? ComponentDesignation { get; set; }
 
 	public string ComponentName
 	{
@@ -17,17 +17,18 @@ public class ComponentModel : IEntity
 				return string.Empty;
 			return ComponentDesignation.Length > 0 ? ComponentDesignation : string.Empty;
 		}
+		set => ComponentDesignation = value;
 	}
 	
-	public bool IsDetail { get; }
+	public bool IsDetail { get; set; }
 	
 	public bool IsStandart { get; }
 	
-	public string Material { get; }
+	public string Material { get; set; }
 	
-	public string Density { get; }
+	public double Density { get; set; }
 	
-	public string? FullFileName { get; init; }
+	public string? FullFileName { get; set; }
 	public string ShortFileName
 	{
 		get

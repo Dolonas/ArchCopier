@@ -27,7 +27,6 @@ public class Kompas3D : IEntity
 	private DocType _activeDocumentType;
 	private IKompasDocument3D _partOrAssembly;
 	private bool _visibility;
-	private HideMessageEnum _hideMassegeMode;
 	private HideMessageEnum _hideMassageMode;
 	private ILogger _logger;
 
@@ -166,6 +165,26 @@ public class Kompas3D : IEntity
 		}
 		return 1;
 	}
+
+	public int RewriteReferencesInAssembly(ComponentModel component, string fullPathToSubFolder)
+	{
+		if(component.IsDetail) return 0;
+		foreach (var item in component)
+		{
+			string oldFileName = item.FileName;
+			item.FileName = fullPathToSubFolder + "/" + Path.GetFileName(oldFileName);
+			try
+			{
+				item.SaveAs(item.FileName);
+				_logger.Information("Компонент записан с именем item.FileName");
+			}
+			catch (Exception ex)
+			{
+				_logger.Information("Ошибка записи компонента с именем item.FileName");
+			}
+		}
+		return 1;
+	}
 	
 	private void GetAllComponentsByRecursion(IPart7 part, List<IPart7> parts)
 	{
@@ -248,7 +267,18 @@ public class Kompas3D : IEntity
 	{
 		var result = new ObservableCollection<ComponentModel>();
 		foreach (var p in innerList)
-			result.Add(new ComponentModel(p));
+		{
+			var component = new ComponentModel
+			{
+				FullFileName = p.FileName,
+				Density = p.Density,
+				IsDetail = p.Detail,
+				ComponentName = p.Name,
+				Material = p.Material
+			};
+
+			result.Add(component);
+		}
 		return result;
 	}
 	

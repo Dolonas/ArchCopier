@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using ArchCopier.Models.Interfaces;
 using ArchCopier.ViewModels.Base;
 
@@ -7,6 +8,7 @@ namespace ArchCopier.Models;
 public class ComponentCollectionModel : ViewModel, IEntity
 {
     private ObservableCollection<ComponentModel>? _components;
+    private ComponentModel _topComponent;
     private ComponentModel? _selectedComponent;
 
     public int Id { get; set; }
@@ -44,6 +46,12 @@ public class ComponentCollectionModel : ViewModel, IEntity
     {
         get => _components;
         set => _components = value;
+    }
+
+    public ComponentModel? TopComponent
+    {
+        get => _components?[0];
+        set => _topComponent = value;
     }
 
     public int SetComponents(ObservableCollection<ComponentModel>? components)
