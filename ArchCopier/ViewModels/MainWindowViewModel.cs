@@ -151,11 +151,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	}
 	private AssemblyTreeModel AssemblyTree
 	{
-		get
-		{
-			if (_assemblyTree != null) return _assemblyTree;
-			return _assemblyTree = new AssemblyTreeModel();
-		}
+		get => _assemblyTree;
 		set
 		{
 			_assemblyTree = value;

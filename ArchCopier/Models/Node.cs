@@ -1,11 +1,10 @@
+using ArchCopier.Models.Interfaces;
 using ArchCopier.ViewModels.Base;
-using Kompas6API3D5COM;
-using Kompas6API5;
 using KompasAPI7;
 
 namespace ArchCopier.Models;
 
-public class Node : ViewModel
+public class Node : ViewModel, INode
 {
     public int Id { get; set; }
     public IPart7 Value { get; set; }
@@ -19,28 +18,26 @@ public class Node : ViewModel
         Children = new List<Node>();
     }
     
-    public void BreadthFirstSearch(Node root) 
+    public void BreadthFirstSearch(INode root) 
     {
-        Queue<Node> queue = new Queue<Node>();
+        Queue<INode> queue = new Queue<INode>();
         queue.Enqueue(root);
         while (queue.Count > 0) 
         {
-            Node current = queue.Dequeue();
-            Console.WriteLine(current.Value);
+            INode current = queue.Dequeue();
             foreach (Node child in current.Children) 
             {
                 queue.Enqueue(child);
             }
         }
     }
-    public void DepthFirstSearch(Node root)
+    public void DepthFirstSearch(INode root)
     {
-        Stack<Node> stack = new Stack<Node>();
+        Stack<INode> stack = new Stack<INode>();
         stack.Push(root);
         while (stack.Count > 0)
         {
-            Node current = stack.Pop();
-            Console.WriteLine(current.Value);
+            INode current = stack.Pop();
             foreach (Node child in current.Children)
             {
                 stack.Push(child);

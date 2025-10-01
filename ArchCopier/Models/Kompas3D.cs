@@ -9,6 +9,7 @@ using Kompas6Constants;
 using KompasAPI7;
 using Serilog;
 using ArchCopier.Infrastructure.Utilities;
+using ArchCopier.Models.Interfaces;
 using IEntity = ArchCopier.Models.Interfaces.IEntity;
 
 namespace ArchCopier.Models;
@@ -166,10 +167,10 @@ public class Kompas3D : IEntity
 		return 1;
 	}
 
-	public int RewriteReferencesInAssembly(ComponentModel component, string fullPathToSubFolder)
+	public int RewriteReferencesInAssembly(INode tree, string fullPathToSubFolder)
 	{
-		if(component.IsDetail) return 0;
-		foreach (var item in component)
+		if(tree.Value.Detail) return 0;
+		foreach (var item in tree)
 		{
 			string oldFileName = item.FileName;
 			item.FileName = fullPathToSubFolder + "/" + Path.GetFileName(oldFileName);
@@ -195,14 +196,14 @@ public class Kompas3D : IEntity
 			if(item.Detail == false) GetAllComponentsByRecursion(item, parts);
 		}
 	}
-	private void GetAssemblyTreeByRecursion(IPart7 part, Node node)
+	private void GetAssemblyTreeByRecursion(IPart7 part, INode node)
 	{
 		var result = new AssemblyTreeModel();
 		node.InsertNode(part, node);
 		foreach (IPart7 item in part.Parts)
 		{
-			if(item.Detail == true) result.InsertNode(item, node);
-			if(item.Detail == false) GetAssemblyTreeByRecursion(item, new Node(item.Part, node));
+			if(item.Detail) result.InsertNode(item, (Node)node);
+			if(!item.Detail) GetAssemblyTreeByRecursion(item, new Node(item.Part, (Node)node));
 		}
 	}
 	public void OpenComponent(string fullFileNameOfComponent)
