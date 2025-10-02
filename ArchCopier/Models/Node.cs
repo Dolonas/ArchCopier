@@ -1,10 +1,9 @@
-using ArchCopier.Models.Interfaces;
 using ArchCopier.ViewModels.Base;
 using KompasAPI7;
 
 namespace ArchCopier.Models;
 
-public class Node : ViewModel, INode
+public class Node : ViewModel, IComparable<IPart7>
 {
     public int Id { get; set; }
     public IPart7 Value { get; set; }
@@ -18,26 +17,26 @@ public class Node : ViewModel, INode
         Children = new List<Node>();
     }
     
-    public void BreadthFirstSearch(INode root) 
+    public void BreadthFirstSearch(Node root) 
     {
-        Queue<INode> queue = new Queue<INode>();
+        Queue<Node> queue = new Queue<Node>();
         queue.Enqueue(root);
         while (queue.Count > 0) 
         {
-            INode current = queue.Dequeue();
+            Node current = queue.Dequeue();
             foreach (Node child in current.Children) 
             {
                 queue.Enqueue(child);
             }
         }
     }
-    public void DepthFirstSearch(INode root)
+    public void DepthFirstSearch(Node root)
     {
-        Stack<INode> stack = new Stack<INode>();
+        Stack<Node> stack = new Stack<Node>();
         stack.Push(root);
         while (stack.Count > 0)
         {
-            INode current = stack.Pop();
+            Node current = stack.Pop();
             foreach (Node child in current.Children)
             {
                 stack.Push(child);
@@ -50,5 +49,11 @@ public class Node : ViewModel, INode
         Node newNode = new Node(value, parent);
         parent.Children.Add(newNode);
         return newNode;
+    }
+ 
+
+    public int CompareTo(IPart7 other)
+    {
+        return Value.CompareTo(other);
     }
 }

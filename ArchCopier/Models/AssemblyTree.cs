@@ -1,46 +1,43 @@
-using ArchCopier.Models.Interfaces;
 using KompasAPI7;
 
 namespace ArchCopier.Models;
 
-public class AssemblyTreeModel: INode, IEntity
+public class AssemblyTreeModel<Node>: IEnumerable<Node>
 {
     public int Id { get; set; }
+    private AssemblyTreeModel<Node> _head;
+
+    private int _count;
     public IPart7 Value { get; set; }
     public Node Parent { get; set; }
     public List<Node> Children { get; set; }
     
-    public AssemblyTreeModel(IPart7 value, INode children) 
+    public AssemblyTreeModel(Node value, Node children) 
     {
         Value = value;
         Children = new List<Node>();
     }
-
-    public AssemblyTreeModel() : this(null, null)
-    {
-            
-    }
     
-    public void BreadthFirstSearch(INode root) 
+    public void BreadthFirstSearch(Node root) 
     {
-        Queue<INode> queue = new Queue<INode>();
+        Queue<Node> queue = new Queue<Node>();
         queue.Enqueue(root);
         while (queue.Count > 0) 
         {
-            INode current = queue.Dequeue();
+            Node current = queue.Dequeue();
             foreach (Node child in current.Children) 
             {
                 queue.Enqueue(child);
             }
         }
     }
-    public void DepthFirstSearch(INode root)
+    public void DepthFirstSearch(Node root)
     {
-        Stack<INode> stack = new Stack<INode>();
+        Stack<Node> stack = new Stack<Node>();
         stack.Push(root);
         while (stack.Count > 0)
         {
-            INode current = stack.Pop();
+            Node current = stack.Pop();
             foreach (Node child in current.Children)
             {
                 stack.Push(child);
@@ -48,10 +45,51 @@ public class AssemblyTreeModel: INode, IEntity
         }
     }
     
-    public Node InsertNode(IPart7 value, Node parent) 
+    public Node InsertNode(Node value, Node parent) 
     {
         Node newNode = new Node(value, parent);
         parent.Children.Add(newNode);
         return newNode;
+    }
+
+    public int CompareTo(Node? other)
+    {
+        if (ReferenceEquals(this, other)) return 0;
+        if (other is null) return 1;
+        return Id.CompareTo(other.Id);
+    }
+
+    #region Нумератор
+
+    public IEnumerator<Node> GetEnumerator() 
+    {
+        return PreOrderTraversal(); 
+    }
+        
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() 
+              
+    { 
+        return GetEnumerator(); 
+    } 
+
+    #endregion
+
+    #region Количество узлов в дереве
+
+    public int Count
+    {
+        get
+        {
+            return _count;
+        }
+    }
+
+    #endregion
+    
+    public IEnumerator<Node> PreOrderTraversal()
+    {
+        AssemblyTreeModel<Node> current = _head;
+
+        yield return current.Value;
     }
 }

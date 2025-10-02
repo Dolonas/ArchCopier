@@ -167,7 +167,7 @@ public class Kompas3D : IEntity
 		return 1;
 	}
 
-	public int RewriteReferencesInAssembly(INode tree, string fullPathToSubFolder)
+	public int RewriteReferencesInAssembly(AssemblyTreeModel<Node> tree, string fullPathToSubFolder)
 	{
 		if(tree.Value.Detail) return 0;
 		foreach (var item in tree)
