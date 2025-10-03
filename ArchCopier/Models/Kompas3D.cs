@@ -126,7 +126,7 @@ public class Kompas3D : IEntity
 		IPart7 part = _partOrAssembly.TopPart;
 		List<IPart7> parts = new List<IPart7>();
 		GetAllComponentsByRecursion(part, parts);
-		var originalsParts = parts.GroupBy(p => p.FileName).Where(p => p.Count() == 1).Select(p => p.First()).ToList();
+		var originalsParts = parts.GroupBy(p => p.FileName).Select(p => p.First()).ToList();
 		return ConvertIPartListToNormalComponentCollection(originalsParts);
 	}
 	public ObservableCollection<ComponentModel> GetTopPurchasedComponents()
@@ -172,8 +172,8 @@ public class Kompas3D : IEntity
 		parts.Add(part);
 		foreach (IPart7 item in part.Parts)
 		{
-			if(item.Detail == true) parts.Add(item);
-			if(item.Detail == false) GetAllComponentsByRecursion(item, parts);
+			if(item.Detail) parts.Add(item);
+			if(!item.Detail) GetAllComponentsByRecursion(item, parts);
 		}
 	}
 	private void GetAssemblyTreeByRecursion(IPart7 part, Node node)
