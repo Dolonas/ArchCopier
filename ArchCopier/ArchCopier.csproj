@@ -6,8 +6,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
-        <AssemblyVersion>0.1.0</AssemblyVersion>
-        <FileVersion>0.1.0</FileVersion>
+        <AssemblyVersion>0.0.11</AssemblyVersion>
+        <FileVersion>0.0.11</FileVersion>
         <ApplicationIcon>Resources\IconsAndImages\Folder - 3D.ico</ApplicationIcon>
         <Version>0.1.0</Version>
         <Copyright>Pavel Dolonas Shishkin</Copyright>
