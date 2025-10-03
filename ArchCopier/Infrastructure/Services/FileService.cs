@@ -185,11 +185,11 @@ public class FileService : IFileService
 		}
 	}
 
-	public void GetNearestFileName(string fileName, out string nearestFileName)
+	public void GetNearestFileName(string fileName, out string nearestFileName) // метод служит для записи файла с похожим именем, если файл с таким именем уже существует
 	{
 		var shortFileName = Path.GetFileName(fileName);
 		string valueOfFileIndexAtEnd = string.Empty;
-		var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(shortFileName);
+		var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(shortFileName); // весь код ниже, до следующего комментария - попытка определить есть ли уже цифорка в конце и какая
 		string newFileNameWithoutExtension;
 		var pattern = @"\(\d\)\.";
 		var regex = new Regex(pattern);
@@ -208,7 +208,7 @@ public class FileService : IFileService
 		}
 		
 		int.TryParse(valueOfFileIndexAtEnd, out int number);
-		newFileNameWithoutExtension = fileNameWithoutExtension.Replace(valueOfFileIndexAtEnd, $"({++number})");
+		newFileNameWithoutExtension = fileNameWithoutExtension.Replace(valueOfFileIndexAtEnd, $"({++number})"); // определяем, какую следующую цифорку нам добавлять и добавляем её в скобках 
 		shortFileName = newFileNameWithoutExtension + Path.GetExtension(shortFileName);
 		nearestFileName = string.Concat(Path.GetDirectoryName(fileName), shortFileName);
 	}
