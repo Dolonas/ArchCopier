@@ -22,7 +22,7 @@ public class TreeBuilder
     public void WriteElementsToFile()
     {
         _fsElements = TreeFileService.ReedDirectoryWithSubElements();
-        if (_fsElements != null) _treeWriter.WriteListToFile(_fsElements, PathToDirectory + "ListOfElements.txt");
+        if (_fsElements != null) _treeWriter.WriteListToFile(_fsElements, Path.Combine(PathToDirectory + "ListOfElements.txt"));
     }
 
     public int BuildTree()
