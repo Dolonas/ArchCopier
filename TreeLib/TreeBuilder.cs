@@ -21,7 +21,7 @@ public class TreeBuilder
 
     public void WriteElementsToFile()
     {
-        _fsElements = TreeFileService.ReedDirectoryWithSubElements(new string[] { "*.*" });
+        _fsElements = TreeFileService.ReedDirectoryWithSubElements();
         if (_fsElements != null) _treeWriter.WriteListToFile(_fsElements, PathToDirectory + "ListOfElements.txt");
     }
 

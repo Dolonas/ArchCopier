@@ -9,15 +9,13 @@ public class TreeFileService
 
 	private string CurrentDirectory { get; set; }
 
-	public List<string>? ReedDirectoryWithSubElements(string[] fileExtensions)
+	public List<string>? ReedDirectoryWithSubElements()
 	{
-		return SearchFiles(CurrentDirectory, fileExtensions);
+		return SearchFiles(CurrentDirectory);
 	}
 
-	private static List<string>? SearchFiles(string? directoryPath, string[] fileExtensions)
+	private List<string>? SearchFiles(string directoryPath)
 	{
-		if (directoryPath is null)
-			return null;
 		try
 		{
 			var files = Directory.EnumerateFiles(directoryPath, "*.*",
@@ -25,10 +23,7 @@ public class TreeFileService
 					{
 						IgnoreInaccessible = true, RecurseSubdirectories = true
 					}) //игнорируем папки и файлы к которым у нас нет доступа
-				.Where(s => fileExtensions.Any(e => e == Path.GetExtension(s)))
 				.Select(Path.GetFullPath).ToList();
-			
-			 ;
 			return files;
 		}
 		catch (UnauthorizedAccessException uAEx)

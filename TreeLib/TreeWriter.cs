@@ -55,7 +55,7 @@ public class TreeWriter
         {
             GetNearestFileName(fileName, out nearestFileName);
         }
-        File.WriteAllLines(nearestFileName, listOfStrings);
+        File.WriteAllLines(nearestFileName,  listOfStrings);
         return 0;
     }
     
