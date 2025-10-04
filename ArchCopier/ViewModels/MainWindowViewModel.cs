@@ -10,6 +10,7 @@ using ArchCopier.Infrastructure.Utilities;
 using ArchCopier.ViewModels.Base;
 using ArchCopier.Models;
 using Serilog;
+using TreeLib;
 // ReSharper disable InconsistentNaming
 
 //TODO: - напоминалка:  в данной версии проекта 0.1.0.0 детали для копирования в подпапку отбираются не по критерию "покупное" а по критерию "деталь верхнего уровня" 
@@ -33,7 +34,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private string _runButtonName;
 	private ComponentCollectionModel? _componentCollection;
 	private ObservableCollection<ComponentModel> _topPurchasedComponentsCollection;
-	private AssemblyTreeModel _assemblyTree;
+	//private AssemblyTreeModel _assemblyTree;
 	private bool _isKompasButtonEnabled;
 	private bool _isWorkButtonsEnabled;
 	private bool _isButtonOfActiveDocumentEnabled;
@@ -46,6 +47,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	private readonly string _pathToThisAppDirectory = AppDomain.CurrentDomain.BaseDirectory;
 	private readonly ILogger _logger;
 	private Kompas3D KompasInstance { get; }
+	private TreeBuilder _treeBuilder; 
 	
 	private double _progress;
 	private Visibility _progressBarVisibility;
@@ -149,15 +151,15 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			NotifyPropertyChanged(nameof(ListComponents));
 		}
 	}
-	private AssemblyTreeModel AssemblyTree
-	{
-		get => _assemblyTree;
-		set
-		{
-			_assemblyTree = value;
-			NotifyPropertyChanged(nameof(ListComponents));
-		}
-	}
+	// private AssemblyTreeModel AssemblyTree
+	// {
+	// 	get => _assemblyTree;
+	// 	set
+	// 	{
+	// 		_assemblyTree = value;
+	// 		NotifyPropertyChanged(nameof(ListComponents));
+	// 	}
+	// }
 
 	public ObservableCollection<ComponentModel> ListComponents => ComponentCollection.GetComponentList() ?? new ObservableCollection<ComponentModel>();
 
@@ -432,7 +434,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 				ArhDirectory);
 			_fileService.CopyFiles(ConvertToListString(_topPurchasedComponentsCollection),
 				ArhDirectory + @"\Прочие");
-			KompasInstance.RewriteReferencesInAssembly(ComponentCollection.GetComponentList());
+			//KompasInstance.RewriteReferencesInAssembly(ComponentCollection.GetComponentList());
 			Status = resultOfCommonComponentsCopying == 0 ? "Файлы не скопированы по неизвестной причине" : $"{resultOfCommonComponentsCopying} файлов скопировано в папку архива";
 			ProgressBarVisibility = Visibility.Hidden;
 		});
@@ -483,14 +485,14 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		var resultOfGettingActiveAssembly = KompasInstance.GetActive3DDocument();
 		ObservableCollection<ComponentModel>? parts;
-		var treeOfParts = _assemblyTree;
+		//var treeOfParts = _assemblyTree;
 		if (resultOfGettingActiveAssembly == 3)
 		{
 			Task.Run(() =>
 			{
 				Status = "Сборка читается...";
 				parts = KompasInstance.GetAllPartsOfActiveAssembly();
-				KompasInstance.GetActiveAssemblyTree(treeOfParts);
+				//KompasInstance.GetActiveAssemblyTree(treeOfParts);
 				//WriteTreeToJsonFile(treeOfParts);
 				if (parts != null) ComponentCollection = new ComponentCollectionModel(parts.ToList());
 				_topPurchasedComponentsCollection = KompasInstance.GetTopPurchasedComponents();
@@ -587,6 +589,22 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 	}
 
 	#endregion
+	
+	#region BuildTreeCommand
+
+	public ICommand BuildTreeCommand { get; }
+
+	private bool CanBuildTreeExecute(object p)
+	{
+		return true;
+	}
+
+	private void OnBuildTreeExecuted(object p)
+	{
+		_treeBuilder.WriteElementsToFile();
+	}
+
+	#endregion
 
 	
 	#region GetHelpCommand
@@ -644,6 +662,7 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 			.CreateLogger();
 		WriteEnvironmentVariablesToLog();
 		var currentDirectory = GetStartDirectory();
+		_treeBuilder = new TreeBuilder(@"D:\temp\Флешка с Димкиного старого телефона");
 		_fileService = fileService;
 		_nameOfFileSettings = Path.Combine(_pathToThisAppDirectory, @"Resources\Settings\settings.json" );
 		CurrentSettings = GetSettingsFromFile(_nameOfFileSettings);
@@ -660,8 +679,8 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		_topPurchasedComponentsCollection = new ObservableCollection<ComponentModel>();
 		SelectedComponent = ComponentCollection?.GetComponentList()?[0];
 		_componentCollection.PropertyChanged += Model_PropertyChanged;
-		_assemblyTree =  new AssemblyTreeModel();
-		_assemblyTree.PropertyChanged += Model_PropertyChanged;
+		//_assemblyTree =  new AssemblyTreeModel();
+		//_assemblyTree.PropertyChanged += Model_PropertyChanged;
 		IsKompasButtonEnabled = true;
 		IsWorkButtonsEnabled = false;
 		IsArchUploadButtonsEnabled = false;
@@ -722,6 +741,9 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		
 		WriteSettingsFileCommand =
 			new LambdaCommand(OnWriteSettingsFileExecuted, CanWriteSettingsFileExecute);
+		
+		BuildTreeCommand =
+			new LambdaCommand(OnBuildTreeExecuted, CanBuildTreeExecute);
 		
 		CloseApplicationCommand =
 			new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
@@ -816,12 +838,13 @@ internal class MainWindowViewModel : ViewModel, INotifyPropertyChanged
 		return newFileName;
 	}
 	
-	private string WriteTreeToJsonFile(Node node)
+	private string WriteTreeToJsonFile()
 	{
-		var jsonFileInString = JsonProcessor.SerialiseJSONNode(node);
-		var newFileName = _fileService.WriteFile(GenerateFileNameForNodeTree(), jsonFileInString);
-		_logger.Information($"Создан файл дерева сборки по пути {newFileName}");
-		return newFileName;
+		// //var jsonFileInString = JsonProcessor.SerialiseJSONNode();
+		// //var newFileName = _fileService.WriteFile(GenerateFileNameForNodeTree(), jsonFileInString);
+		// _logger.Information($"Создан файл дерева сборки по пути {newFileName}");
+		//return newFileName;
+		return string.Empty;
 	}
 
 	private List<string> ConvertToListString(ObservableCollection<ComponentModel>? collection)

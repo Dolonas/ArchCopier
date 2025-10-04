@@ -81,4 +81,8 @@
       </Resource>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TreeLib\TreeLib.csproj" />
+    </ItemGroup>
+
 </Project>

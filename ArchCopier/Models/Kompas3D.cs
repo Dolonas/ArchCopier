@@ -143,12 +143,12 @@ public class Kompas3D : IEntity
 		return ConvertIPartListToNormalComponentCollection(originalsParts);
 	}
 	
-	public void GetActiveAssemblyTree(AssemblyTreeModel assemblyTree)
+	public void GetActiveAssemblyTree()
 	{
 		GetActive3DDocument();
 		IPart7 part = _partOrAssembly.TopPart;
 		List<IPart7> parts = new List<IPart7>();
-		GetAssemblyTreeByRecursion(part, assemblyTree);
+		//GetAssemblyTreeByRecursion(part, assemblyTree);
 	}
 
 	public int GetActive3DDocument()
@@ -170,20 +170,20 @@ public class Kompas3D : IEntity
 	public int RewriteReferencesInAssembly(AssemblyTreeModel<Node> tree, string fullPathToSubFolder)
 	{
 		if(tree.Value.Detail) return 0;
-		foreach (var item in tree)
-		{
-			string oldFileName = item.FileName;
-			item.FileName = fullPathToSubFolder + "/" + Path.GetFileName(oldFileName);
-			try
-			{
-				item.SaveAs(item.FileName);
-				_logger.Information("Компонент записан с именем item.FileName");
-			}
-			catch (Exception ex)
-			{
-				_logger.Information("Ошибка записи компонента с именем item.FileName");
-			}
-		}
+		// foreach (var item in tree)
+		// {
+		// 	//string oldFileName = item.FileName;
+		// 	//item.FileName = fullPathToSubFolder + "/" + Path.GetFileName(oldFileName);
+		// 	try
+		// 	{
+		// 		//item.SaveAs(item.FileName);
+		// 		_logger.Information("Компонент записан с именем item.FileName");
+		// 	}
+		// 	catch (Exception ex)
+		// 	{
+		// 		_logger.Information("Ошибка записи компонента с именем item.FileName");
+		// 	}
+		// }
 		return 1;
 	}
 	
@@ -196,14 +196,14 @@ public class Kompas3D : IEntity
 			if(item.Detail == false) GetAllComponentsByRecursion(item, parts);
 		}
 	}
-	private void GetAssemblyTreeByRecursion(IPart7 part, INode node)
+	private void GetAssemblyTreeByRecursion(IPart7 part)
 	{
-		var result = new AssemblyTreeModel();
-		node.InsertNode(part, node);
+		//var result = new AssemblyTreeModel();
+		//node.InsertNode(part, node);
 		foreach (IPart7 item in part.Parts)
 		{
-			if(item.Detail) result.InsertNode(item, (Node)node);
-			if(!item.Detail) GetAssemblyTreeByRecursion(item, new Node(item.Part, (Node)node));
+			//if(item.Detail) result.InsertNode(item, (Node)node);
+			//if(!item.Detail) GetAssemblyTreeByRecursion(item, new Node(item.Part));
 		}
 	}
 	public void OpenComponent(string fullFileNameOfComponent)

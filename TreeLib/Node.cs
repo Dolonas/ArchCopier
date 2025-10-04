@@ -54,7 +54,6 @@ public class Node : IComparable<Node>
         parent.Children.Add(newNode);
         return newNode;
     }
- 
 
     public int CompareTo(string other)
     {
@@ -69,6 +68,6 @@ public class Node : IComparable<Node>
         if (idComparison != 0) return idComparison;
         var valueComparison = string.Compare(Value, other.Value, StringComparison.Ordinal);
         if (valueComparison != 0) return valueComparison;
-        return Parent.CompareTo((string)other.Parent);
+        return Parent.CompareTo(other.Parent);
     }
 }

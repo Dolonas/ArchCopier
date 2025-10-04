@@ -1,7 +1,3 @@
-using System.IO;
-using Microsoft.Win32;
-using System.Text.RegularExpressions;
-
 namespace TreeLib;
 
 public class TreeFileService
@@ -10,11 +6,11 @@ public class TreeFileService
 	{
 		CurrentDirectory = currentDirectory;
 	}
-	public string CurrentDirectory { get; set; }
 
-	public List<string>? ReedDirectoryWithSubElements(string pathToDirectory, string[] fileExtensions, out Tree tree)
+	private string CurrentDirectory { get; set; }
+
+	public List<string>? ReedDirectoryWithSubElements(string[] fileExtensions)
 	{
-		CurrentDirectory = Path.GetFullPath(pathToDirectory);
 		return SearchFiles(CurrentDirectory, fileExtensions);
 	}
 

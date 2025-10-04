@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 
 namespace TreeLib;
-
-
 public class Tree : IEnumerable<Node> 
 {
     public int Id { get; set; }
@@ -12,7 +10,6 @@ public class Tree : IEnumerable<Node>
     public Node Value { get; set; }
     public Node Parent { get; set; }
     public List<Node> Children { get; set; }
-    
     public int Count => _count;
 
     public Tree(Node head, Node parent) 
@@ -37,48 +34,10 @@ public class Tree : IEnumerable<Node>
 
         else
         {
-            AddTo(_head, value);
+            
         }
         _count++;
     }
-    
-    private void AddTo(Node node, Node value)
-    {
-        // Первый случай: значение добавляемого узла меньше чем значение текущего. 
-
-        if (value.CompareTo(node.Value) < 0)
-        {
-            // если левый потомок отсутствует - добавляем его          
-
-            if (node.Left == null)
-            {
-                node.Left = new BinaryTreeNode<T>(value);
-            }
-            else
-            {
-                // повторная итерация               
-                AddTo(node.Left, value);
-            }
-        }
-        // Второй случай: значение добавляемого узла равно или больше текущего значения      
-        else
-        {
-            // Если правый потомок отсутствует - добавлем его.          
-
-            if (node.Right == null)
-            {
-                node.Right = new BinaryTreeNode<T>(value);
-            }
-            else
-            {
-                // повторная итерация
-
-                AddTo(node.Right, value);
-            }
-        }
-    }
-
-    
         
     public void BreadthFirstSearch(Node root) 
     {
@@ -109,14 +68,14 @@ public class Tree : IEnumerable<Node>
     
     public Node InsertNode(string value, Node parent) 
     {
-        Node newNode = new Node(value, parent);
+        Node newNode = new Node(parent, value);
         parent.Children.Add(newNode);
         return newNode;
     }
 
     public IEnumerator<Node> GetEnumerator()
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     IEnumerator IEnumerable.GetEnumerator()

@@ -54,6 +54,7 @@ public class Node : ViewModel, IComparable<IPart7>
 
     public int CompareTo(IPart7 other)
     {
-        return Value.CompareTo(other);
+        //return Value.CompareTo(other);
+        return 0;
     }
 }

@@ -38,6 +38,7 @@
               materialDesign:MenuAssist.TopLevelMenuItemHeight="25">
             <MenuItem Header="Файл">
                 <MenuItem Header="Открыть сборку в Компасе" Command="{Binding OpenAssemblyCommand}" />
+                <MenuItem Header="Построить дерево" Command="{Binding BuildTreeCommand}" />
                 <Separator />
                 
                 <MenuItem Header="Выход" Command="{Binding CloseApplicationCommand}" />
