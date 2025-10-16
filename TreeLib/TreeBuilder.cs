@@ -32,6 +32,7 @@ public class TreeBuilder
         foreach (var item in _fsElements)
         {
             
+            TreeInstance.Add(item);
         }
         return 0;
     }

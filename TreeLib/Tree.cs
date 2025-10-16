@@ -4,7 +4,7 @@ namespace TreeLib;
 public class Tree : IEnumerable<Node> 
 {
     public int Id { get; set; }
-    private Node _head;
+    private Node? _head;
 
     private int _count;
     public Node Value { get; set; }

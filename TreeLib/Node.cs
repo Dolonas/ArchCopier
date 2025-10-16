@@ -3,21 +3,21 @@ namespace TreeLib;
 public class Node : IComparable<Node>
 {
     public int Id { get; set; }
-    private string Value { get; set; }
+    private string NodeName { get; set; }
     private Node? Parent { get; set; }
     internal List<Node> Children { get; set; }
     
-    public Node(Node parent, string value)
+    public Node(Node? parent, string nodeName)
     {
         Parent = parent;
-        Value = value;
+        NodeName = nodeName;
         Children = new List<Node>();
     }
     
-    public Node(string value)
+    public Node(string nodeName)
     {
         Parent = null;
-        Value = value;
+        NodeName = nodeName;
         Children = new List<Node>();
     }
     
@@ -57,7 +57,7 @@ public class Node : IComparable<Node>
 
     public int CompareTo(string other)
     {
-        return Value.CompareTo(other);
+        return NodeName.CompareTo(other);
     }
 
     public int CompareTo(Node? other)
@@ -66,7 +66,7 @@ public class Node : IComparable<Node>
         if (other is null) return 1;
         var idComparison = Id.CompareTo(other.Id);
         if (idComparison != 0) return idComparison;
-        var valueComparison = string.Compare(Value, other.Value, StringComparison.Ordinal);
+        var valueComparison = string.Compare(NodeName, other.NodeName, StringComparison.Ordinal);
         if (valueComparison != 0) return valueComparison;
         return Parent.CompareTo(other.Parent);
     }
